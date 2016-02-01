@@ -19,6 +19,8 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    tasks = List.map (\content -> h3 [] [text content]) model.tasks
+    header = h2 [] [text model.name]
+    tasks = List.map (\content -> h4 [] [text content]) model.tasks
+    allHtml = header :: tasks
   in
-    section [] tasks
+    section [] allHtml

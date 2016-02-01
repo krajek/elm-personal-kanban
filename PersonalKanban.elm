@@ -46,7 +46,8 @@ columnStyle : Attribute
 columnStyle =
   style
     [ ("float", "left")
-    ]
+    , ("width", "33%")
+    , ("text-align", "center") ]
 
 view : Signal.Address Action -> Model -> Html
 view address model =

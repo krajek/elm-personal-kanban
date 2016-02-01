@@ -11743,12 +11743,16 @@ Elm.TaskColumn.make = function (_elm) {
    var view = F2(function (address,model) {
       var tasks = A2($List.map,
       function (content) {
-         return A2($Html.h3,
+         return A2($Html.h4,
          _U.list([]),
          _U.list([$Html.text(content)]));
       },
       model.tasks);
-      return A2($Html.section,_U.list([]),tasks);
+      var header = A2($Html.h2,
+      _U.list([]),
+      _U.list([$Html.text(model.name)]));
+      var allHtml = A2($List._op["::"],header,tasks);
+      return A2($Html.section,_U.list([]),allHtml);
    });
    var update = F2(function (action,model) {
       var _p0 = action;
@@ -11785,7 +11789,9 @@ Elm.PersonalKanban.make = function (_elm) {
    var _op = {};
    var columnStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                      ,_0: "float"
-                                                     ,_1: "left"}]));
+                                                     ,_1: "left"}
+                                                    ,{ctor: "_Tuple2",_0: "width",_1: "33%"}
+                                                    ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}]));
    var update = F2(function (action,model) {
       var _p0 = action;
       if (_p0.ctor === "NoOp") {

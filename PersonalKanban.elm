@@ -42,17 +42,24 @@ update action model =
 
 -- VIEW
 
-columnStyle : Attribute
-columnStyle =
+tableStyle : Attribute
+tableStyle =
   style
-    [ ("float", "left")
-    , ("width", "33%")
-    , ("text-align", "center") ]
+    [ ("table-layout", "fixed")
+    , ("width", "100%")
+    , ("height", "100%")
+    , ("border-collapse", "collapse") ]
+
+cellStyle : Attribute
+cellStyle =
+  style
+    [("border", "1px solid black")]
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
     viewColumn column =
-      div [columnStyle] [TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column]
+        td [cellStyle]
+          [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]
   in
-    div [] (List.map viewColumn model.columns)
+    table [tableStyle] [tr [] <| List.map viewColumn model.columns]

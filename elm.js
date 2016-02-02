@@ -11787,11 +11787,15 @@ Elm.PersonalKanban.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $TaskColumn = Elm.TaskColumn.make(_elm);
    var _op = {};
-   var columnStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                     ,_0: "float"
-                                                     ,_1: "left"}
-                                                    ,{ctor: "_Tuple2",_0: "width",_1: "33%"}
-                                                    ,{ctor: "_Tuple2",_0: "text-align",_1: "center"}]));
+   var cellStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                   ,_0: "border"
+                                                   ,_1: "1px solid black"}]));
+   var tableStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                    ,_0: "table-layout"
+                                                    ,_1: "fixed"}
+                                                   ,{ctor: "_Tuple2",_0: "width",_1: "100%"}
+                                                   ,{ctor: "_Tuple2",_0: "height",_1: "100%"}
+                                                   ,{ctor: "_Tuple2",_0: "border-collapse",_1: "collapse"}]));
    var update = F2(function (action,model) {
       var _p0 = action;
       if (_p0.ctor === "NoOp") {
@@ -11817,15 +11821,17 @@ Elm.PersonalKanban.make = function (_elm) {
    };
    var view = F2(function (address,model) {
       var viewColumn = function (column) {
-         return A2($Html.div,
-         _U.list([columnStyle]),
+         return A2($Html.td,
+         _U.list([cellStyle]),
          _U.list([A2($TaskColumn.view,
          A2($Signal.forwardTo,address,TaskColumnAction),
          column)]));
       };
-      return A2($Html.div,
+      return A2($Html.table,
+      _U.list([tableStyle]),
+      _U.list([A2($Html.tr,
       _U.list([]),
-      A2($List.map,viewColumn,model.columns));
+      A2($List.map,viewColumn,model.columns))]));
    });
    var NoOp = {ctor: "NoOp"};
    return _elm.PersonalKanban.values = {_op: _op
@@ -11834,7 +11840,8 @@ Elm.PersonalKanban.make = function (_elm) {
                                        ,Model: Model
                                        ,init: init
                                        ,update: update
-                                       ,columnStyle: columnStyle
+                                       ,tableStyle: tableStyle
+                                       ,cellStyle: cellStyle
                                        ,view: view};
 };
 Elm.Main = Elm.Main || {};

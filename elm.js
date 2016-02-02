@@ -11748,18 +11748,14 @@ Elm.TaskColumn.make = function (_elm) {
          _U.list([$Html.text(content)]));
       },
       model.tasks);
-      var header = A2($Html.h2,
-      _U.list([]),
-      _U.list([$Html.text(model.name)]));
-      var allHtml = A2($List._op["::"],header,tasks);
-      return A2($Html.section,_U.list([]),allHtml);
+      return A2($Html.section,_U.list([]),tasks);
    });
    var update = F2(function (action,model) {
       var _p0 = action;
       return _U.update(model,
       {tasks: A2($Basics._op["++"],model.tasks,_U.list([_p0._0]))});
    });
-   var Model = F2(function (a,b) {    return {name: a,tasks: b};});
+   var Model = function (a) {    return {tasks: a};};
    var AddTask = function (a) {
       return {ctor: "AddTask",_0: a};
    };
@@ -11768,6 +11764,30 @@ Elm.TaskColumn.make = function (_elm) {
                                    ,Model: Model
                                    ,update: update
                                    ,view: view};
+};
+Elm.TaskHeader = Elm.TaskHeader || {};
+Elm.TaskHeader.make = function (_elm) {
+   "use strict";
+   _elm.TaskHeader = _elm.TaskHeader || {};
+   if (_elm.TaskHeader.values) return _elm.TaskHeader.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var view = function (model) {
+      return A2($Html.h2,
+      _U.list([]),
+      _U.list([$Html.text(model.name)]));
+   };
+   var Model = function (a) {    return {name: a};};
+   return _elm.TaskHeader.values = {_op: _op
+                                   ,view: view
+                                   ,Model: Model};
 };
 Elm.PersonalKanban = Elm.PersonalKanban || {};
 Elm.PersonalKanban.make = function (_elm) {
@@ -11785,8 +11805,12 @@ Elm.PersonalKanban.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
-   $TaskColumn = Elm.TaskColumn.make(_elm);
+   $TaskColumn = Elm.TaskColumn.make(_elm),
+   $TaskHeader = Elm.TaskHeader.make(_elm);
    var _op = {};
+   var headerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                     ,_0: "height"
+                                                     ,_1: "100px"}]));
    var cellStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                    ,_0: "border"
                                                    ,_1: "1px solid black"}]));
@@ -11805,11 +11829,15 @@ Elm.PersonalKanban.make = function (_elm) {
          }
    });
    var init = function () {
-      var doneColumn = {name: "Done"
-                       ,tasks: _U.list(["Fake task"])};
-      var inProgressColumn = {name: "In Progress"
-                             ,tasks: _U.list(["Fake task"])};
-      var todoColumn = {name: "To Do",tasks: _U.list(["Fake task"])};
+      var doneColumn = {ctor: "_Tuple2"
+                       ,_0: {name: "Done"}
+                       ,_1: {tasks: _U.list(["Fake task"])}};
+      var inProgressColumn = {ctor: "_Tuple2"
+                             ,_0: {name: "In progress"}
+                             ,_1: {tasks: _U.list(["Fake task"])}};
+      var todoColumn = {ctor: "_Tuple2"
+                       ,_0: {name: "To do"}
+                       ,_1: {tasks: _U.list(["Fake task"])}};
       var model = {columns: _U.list([todoColumn
                                     ,inProgressColumn
                                     ,doneColumn])};
@@ -11820,18 +11848,31 @@ Elm.PersonalKanban.make = function (_elm) {
       return {ctor: "TaskColumnAction",_0: a};
    };
    var view = F2(function (address,model) {
-      var viewColumn = function (column) {
+      var viewColumnCell = function (column) {
          return A2($Html.td,
          _U.list([cellStyle]),
          _U.list([A2($TaskColumn.view,
          A2($Signal.forwardTo,address,TaskColumnAction),
          column)]));
       };
+      var cellsRow = A2($Html.tr,
+      _U.list([headerStyle]),
+      A2($List.map,
+      viewColumnCell,
+      A2($List.map,$Basics.snd,model.columns)));
+      var viewHeader = function (headerModel) {
+         return A2($Html.th,
+         _U.list([]),
+         _U.list([$TaskHeader.view(headerModel)]));
+      };
+      var headersRow = A2($Html.tr,
+      _U.list([headerStyle]),
+      A2($List.map,
+      viewHeader,
+      A2($List.map,$Basics.fst,model.columns)));
       return A2($Html.table,
       _U.list([tableStyle]),
-      _U.list([A2($Html.tr,
-      _U.list([]),
-      A2($List.map,viewColumn,model.columns))]));
+      _U.list([headersRow,cellsRow]));
    });
    var NoOp = {ctor: "NoOp"};
    return _elm.PersonalKanban.values = {_op: _op
@@ -11842,6 +11883,7 @@ Elm.PersonalKanban.make = function (_elm) {
                                        ,update: update
                                        ,tableStyle: tableStyle
                                        ,cellStyle: cellStyle
+                                       ,headerStyle: headerStyle
                                        ,view: view};
 };
 Elm.Main = Elm.Main || {};

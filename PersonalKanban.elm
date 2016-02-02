@@ -4,6 +4,7 @@ import Effects exposing (Effects, none)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import TaskColumn
+import TaskHeader
 
 -- ACTION
 
@@ -14,17 +15,17 @@ type Action
 -- MODEL
 
 type alias Model =
-    { columns : List TaskColumn.Model
-    }
+    { columns : List (TaskHeader.Model, TaskColumn.Model) }
 
 
 init : (Model, Effects Action)
 init =
   let
-    todoColumn = { name = "To Do", tasks = ["Fake task"] }
-    inProgressColumn = { name = "In Progress", tasks = ["Fake task"] }
-    doneColumn = { name = "Done", tasks = ["Fake task"] }
-    model = { columns = [todoColumn, inProgressColumn, doneColumn] }
+    todoColumn = ( {name = "To do" }, { tasks = ["Fake task"] })
+    inProgressColumn = ( {name = "In progress" }, { tasks = ["Fake task"] })
+    doneColumn = ( {name = "Done"}, { tasks = ["Fake task"] })
+    model =
+      { columns = [todoColumn, inProgressColumn, doneColumn] }
   in
     ( model, Effects.none )
 
@@ -55,11 +56,20 @@ cellStyle =
   style
     [("border", "1px solid black")]
 
+headerStyle : Attribute
+headerStyle =
+  style
+    [("height", "100px")]
+
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    viewColumn column =
+    viewHeader headerModel =
+      th [] [TaskHeader.view headerModel]
+    viewColumnCell column =
         td [cellStyle]
           [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]
+    headersRow = tr [headerStyle] <| List.map viewHeader (List.map fst model.columns)
+    cellsRow = tr [headerStyle] <| List.map viewColumnCell (List.map snd model.columns)
   in
-    table [tableStyle] [tr [] <| List.map viewColumn model.columns]
+    table [tableStyle] [headersRow, cellsRow]

@@ -6,8 +6,7 @@ type Action =
   AddTask String
 
 type alias Model =
-  { name : String
-  , tasks : List String }
+  { tasks : List String }
 
 update : Action -> Model -> Model
 update action model =
@@ -19,8 +18,6 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    header = h2 [] [text model.name]
     tasks = List.map (\content -> h4 [] [text content]) model.tasks
-    allHtml = header :: tasks
   in
-    section [] allHtml
+    section [] tasks

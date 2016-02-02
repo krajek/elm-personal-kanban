@@ -11,6 +11,7 @@ import TaskHeader
 type Action
     = NoOp
     | TaskColumnAction TaskColumn.Action
+    | AddNewTaskToBoardRequest
 
 -- MODEL
 
@@ -41,6 +42,21 @@ update action model =
     TaskColumnAction columnAction ->
       (model, Effects.none)
 
+    AddNewTaskToBoardRequest ->
+      let
+        updateFirstColumn index (headerModel, columnModel) =
+          if index == 0 then
+            (headerModel, TaskColumn.update (TaskColumn.AddTask "New task") columnModel)
+          else
+            (headerModel, columnModel)
+        newColumns : List (TaskHeader.Model, TaskColumn.Model)
+        newColumns = List.indexedMap updateFirstColumn model.columns
+        newModel : Model
+        newModel = { model | columns = newColumns }
+
+      in
+        (newModel, Effects.none)
+
 -- VIEW
 
 tableStyle : Attribute
@@ -64,8 +80,9 @@ headerStyle =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
+    headerContext = { addTaskAddress = Signal.forwardTo address (always AddNewTaskToBoardRequest)}
     viewHeader headerModel =
-      th [] [TaskHeader.view headerModel]
+      th [] [TaskHeader.view headerContext headerModel]
     viewColumnCell column =
         td [cellStyle]
           [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]

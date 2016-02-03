@@ -11862,22 +11862,31 @@ Elm.TaskHeader.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var buttonStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                     ,_0: "float"
+                                                     ,_1: "right"}
+                                                    ,{ctor: "_Tuple2",_0: "margin-right",_1: "10px"}]));
+   var headerTextStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                         ,_0: "font-size"
+                                                         ,_1: "x-large"}]));
    var view = F2(function (context,model) {
-      return A2($Html.div,
+      return A2($Html.span,
       _U.list([]),
-      _U.list([A2($Html.h2,
-              _U.list([]),
+      _U.list([A2($Html.span,
+              _U.list([headerTextStyle]),
               _U.list([$Html.text(model.name)]))
               ,A2($Html.button,
-              _U.list([A2($Html$Events.onClick,
-              context.addTaskAddress,
-              {ctor: "_Tuple0"})]),
+              _U.list([buttonStyle
+                      ,A2($Html$Events.onClick,
+                      context.addTaskAddress,
+                      {ctor: "_Tuple0"})]),
               _U.list([$Html.text("+")]))]));
    });
    var Context = function (a) {    return {addTaskAddress: a};};

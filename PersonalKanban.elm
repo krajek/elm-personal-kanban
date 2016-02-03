@@ -70,7 +70,8 @@ tableStyle =
 cellStyle : Attribute
 cellStyle =
   style
-    [("border", "1px solid black")]
+    [ ("border", "1px solid black")
+    , ("vertical-align", "top")]
 
 headerStyle : Attribute
 headerStyle =

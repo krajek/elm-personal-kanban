@@ -11922,7 +11922,8 @@ Elm.PersonalKanban.make = function (_elm) {
                                                      ,_1: "100px"}]));
    var cellStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                    ,_0: "border"
-                                                   ,_1: "1px solid black"}]));
+                                                   ,_1: "1px solid black"}
+                                                  ,{ctor: "_Tuple2",_0: "vertical-align",_1: "top"}]));
    var tableStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                     ,_0: "table-layout"
                                                     ,_1: "fixed"}

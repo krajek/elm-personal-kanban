@@ -11905,6 +11905,9 @@ Elm.PersonalKanban.make = function (_elm) {
    $TaskColumn = Elm.TaskColumn.make(_elm),
    $TaskHeader = Elm.TaskHeader.make(_elm);
    var _op = {};
+   var headerCellStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                         ,_0: "border"
+                                                         ,_1: "1px solid black"}]));
    var headerStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                      ,_0: "height"
                                                      ,_1: "100px"}]));
@@ -11971,7 +11974,7 @@ Elm.PersonalKanban.make = function (_elm) {
          column)]));
       };
       var cellsRow = A2($Html.tr,
-      _U.list([headerStyle]),
+      _U.list([]),
       A2($List.map,
       viewColumnCell,
       A2($List.map,$Basics.snd,model.columns)));
@@ -11980,7 +11983,7 @@ Elm.PersonalKanban.make = function (_elm) {
       $Basics.always(AddNewTaskToBoardRequest))};
       var viewHeader = function (headerModel) {
          return A2($Html.th,
-         _U.list([]),
+         _U.list([headerCellStyle]),
          _U.list([A2($TaskHeader.view,headerContext,headerModel)]));
       };
       var headersRow = A2($Html.tr,
@@ -12003,6 +12006,7 @@ Elm.PersonalKanban.make = function (_elm) {
                                        ,tableStyle: tableStyle
                                        ,cellStyle: cellStyle
                                        ,headerStyle: headerStyle
+                                       ,headerCellStyle: headerCellStyle
                                        ,view: view};
 };
 Elm.Main = Elm.Main || {};

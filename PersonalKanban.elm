@@ -75,18 +75,23 @@ cellStyle =
 headerStyle : Attribute
 headerStyle =
   style
-    [("height", "100px")]
+    [ ("height", "100px") ]
+
+headerCellStyle : Attribute
+headerCellStyle =
+  style
+    [("border", "1px solid black")]
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
     headerContext = { addTaskAddress = Signal.forwardTo address (always AddNewTaskToBoardRequest)}
     viewHeader headerModel =
-      th [] [TaskHeader.view headerContext headerModel]
+      th [headerCellStyle] [TaskHeader.view headerContext headerModel]
     viewColumnCell column =
         td [cellStyle]
           [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]
     headersRow = tr [headerStyle] <| List.map viewHeader (List.map fst model.columns)
-    cellsRow = tr [headerStyle] <| List.map viewColumnCell (List.map snd model.columns)
+    cellsRow = tr [] <| List.map viewColumnCell (List.map snd model.columns)
   in
     table [tableStyle] [headersRow, cellsRow]

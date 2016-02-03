@@ -11823,19 +11823,23 @@ Elm.TaskColumn.make = function (_elm) {
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var taskStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                                   ,_0: "border"
+                                                   ,_1: "1px solid black"}
+                                                  ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}]));
    var view = F2(function (address,model) {
-      var tasks = A2($List.map,
-      function (content) {
-         return A2($Html.h4,
-         _U.list([]),
+      var viewTask = function (content) {
+         return A2($Html.p,
+         _U.list([taskStyle]),
          _U.list([$Html.text(content)]));
-      },
-      model.tasks);
+      };
+      var tasks = A2($List.map,viewTask,model.tasks);
       return A2($Html.section,_U.list([]),tasks);
    });
    var update = F2(function (action,model) {
@@ -11851,6 +11855,7 @@ Elm.TaskColumn.make = function (_elm) {
                                    ,AddTask: AddTask
                                    ,Model: Model
                                    ,update: update
+                                   ,taskStyle: taskStyle
                                    ,view: view};
 };
 Elm.TaskHeader = Elm.TaskHeader || {};

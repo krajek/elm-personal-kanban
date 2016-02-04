@@ -19,7 +19,8 @@ update action model =
 taskStyle =
   style
   [ ("border", "1px solid black")
-  , ("margin", "20px 10px")]
+  , ("margin", "20px 10px")
+  , ("cursor", "pointer")]
 
 view : Signal.Address Action -> Model -> Html
 view address model =

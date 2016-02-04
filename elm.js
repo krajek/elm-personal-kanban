@@ -11832,7 +11832,8 @@ Elm.TaskColumn.make = function (_elm) {
    var taskStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                    ,_0: "border"
                                                    ,_1: "1px solid black"}
-                                                  ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}]));
+                                                  ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}
+                                                  ,{ctor: "_Tuple2",_0: "cursor",_1: "pointer"}]));
    var view = F2(function (address,model) {
       var viewTask = function (content) {
          return A2($Html.p,

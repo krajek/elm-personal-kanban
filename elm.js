@@ -11814,6 +11814,53 @@ Elm.StartApp.make = function (_elm) {
                                  ,Config: Config
                                  ,App: App};
 };
+Elm.AddTaskPopup = Elm.AddTaskPopup || {};
+Elm.AddTaskPopup.make = function (_elm) {
+   "use strict";
+   _elm.AddTaskPopup = _elm.AddTaskPopup || {};
+   if (_elm.AddTaskPopup.values) return _elm.AddTaskPopup.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm);
+   var _op = {};
+   var windowStyle = function (visible) {
+      return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                             ,_0: "display"
+                                             ,_1: visible ? "fixed" : "none"}
+                                            ,{ctor: "_Tuple2",_0: "position",_1: "absolute"}
+                                            ,{ctor: "_Tuple2",_0: "top",_1: "25%"}
+                                            ,{ctor: "_Tuple2",_0: "left",_1: "25%"}
+                                            ,{ctor: "_Tuple2",_0: "width",_1: "50%"}
+                                            ,{ctor: "_Tuple2",_0: "height",_1: "50%"}
+                                            ,{ctor: "_Tuple2",_0: "padding",_1: "16px"}
+                                            ,{ctor: "_Tuple2",_0: "border",_1: "16px solid orange"}
+                                            ,{ctor: "_Tuple2",_0: "background-color",_1: "white"}
+                                            ,{ctor: "_Tuple2",_0: "z-index",_1: "1002"}
+                                            ,{ctor: "_Tuple2",_0: "overflow",_1: "auto"}]));
+   };
+   var view = F2(function (address,model) {
+      return A2($Html.div,
+      _U.list([windowStyle(model.visible)]),
+      _U.list([]));
+   });
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      return _U.update(model,{visible: true});
+   });
+   var Show = {ctor: "Show"};
+   var init = {visible: false};
+   var Model = function (a) {    return {visible: a};};
+   return _elm.AddTaskPopup.values = {_op: _op
+                                     ,init: init
+                                     ,view: view
+                                     ,Model: Model};
+};
 Elm.TaskColumn = Elm.TaskColumn || {};
 Elm.TaskColumn.make = function (_elm) {
    "use strict";

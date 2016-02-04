@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import TaskColumn
 import TaskHeader
+import AddTaskPopup
 
 -- ACTION
 

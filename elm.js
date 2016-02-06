@@ -11846,13 +11846,6 @@ Elm.AddTaskPopup.make = function (_elm) {
                                             ,{ctor: "_Tuple2",_0: "z-index",_1: "1002"}
                                             ,{ctor: "_Tuple2",_0: "overflow",_1: "auto"}]));
    };
-   var update = F2(function (action,model) {
-      var _p0 = action;
-      switch (_p0.ctor)
-      {case "Show": return _U.update(model,{visible: true});
-         case "Hide": return _U.update(model,{visible: false});
-         default: return _U.update(model,{taskDescription: _p0._0});}
-   });
    var TaskDescription = function (a) {
       return {ctor: "TaskDescription",_0: a};
    };
@@ -11872,8 +11865,8 @@ Elm.AddTaskPopup.make = function (_elm) {
               ,A3($Html$Events.on,
               "input",
               $Html$Events.targetValue,
-              function (_p1) {
-                 return A2($Signal.message,address,TaskDescription(_p1));
+              function (_p0) {
+                 return A2($Signal.message,address,TaskDescription(_p0));
               })]),
       _U.list([]));
       var popupContent = A2($Html.div,
@@ -11885,6 +11878,13 @@ Elm.AddTaskPopup.make = function (_elm) {
    });
    var Show = {ctor: "Show"};
    var init = {visible: false,taskDescription: ""};
+   var update = F2(function (action,model) {
+      var _p1 = action;
+      switch (_p1.ctor)
+      {case "Show": return _U.update(init,{visible: true});
+         case "Hide": return _U.update(model,{visible: false});
+         default: return _U.update(model,{taskDescription: _p1._0});}
+   });
    var Model = F2(function (a,b) {
       return {visible: a,taskDescription: b};
    });

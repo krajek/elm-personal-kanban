@@ -26,7 +26,7 @@ type Action
 update : Action -> Model -> Model
 update action model =
   case action of
-    Show -> { model | visible = True }
+    Show -> { init | visible = True }
     Hide -> { model | visible = False}
     TaskDescription desc -> { model | taskDescription = desc }
 

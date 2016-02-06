@@ -11847,24 +11847,41 @@ Elm.AddTaskPopup.make = function (_elm) {
    };
    var update = F2(function (action,model) {
       var _p0 = action;
-      if (_p0.ctor === "Show") {
-            return _U.update(model,{visible: true});
-         } else {
-            return _U.update(model,{visible: false});
-         }
+      switch (_p0.ctor)
+      {case "Show": return _U.update(model,{visible: true});
+         case "Cancel": return _U.update(model,{visible: false});
+         default: return _U.update(model,{taskDescription: _p0._0});}
    });
+   var TaskDescription = function (a) {
+      return {ctor: "TaskDescription",_0: a};
+   };
    var Cancel = {ctor: "Cancel"};
    var view = F2(function (address,model) {
-      var popupContent = A2($Html.button,
+      var cancelButton = A2($Html.button,
       _U.list([A2($Html$Events.onClick,address,Cancel)]),
       _U.list([$Html.text("Cancel")]));
+      var taskInput = A2($Html.input,
+      _U.list([$Html$Attributes.placeholder("Enter task description")
+              ,$Html$Attributes.value(model.taskDescription)
+              ,A3($Html$Events.on,
+              "input",
+              $Html$Events.targetValue,
+              function (_p1) {
+                 return A2($Signal.message,address,TaskDescription(_p1));
+              })]),
+      _U.list([]));
+      var popupContent = A2($Html.div,
+      _U.list([]),
+      _U.list([taskInput,cancelButton]));
       return A2($Html.div,
       _U.list([windowStyle(model.visible)]),
       _U.list([popupContent]));
    });
    var Show = {ctor: "Show"};
-   var init = {visible: false};
-   var Model = function (a) {    return {visible: a};};
+   var init = {visible: false,taskDescription: ""};
+   var Model = F2(function (a,b) {
+      return {visible: a,taskDescription: b};
+   });
    return _elm.AddTaskPopup.values = {_op: _op
                                      ,init: init
                                      ,update: update

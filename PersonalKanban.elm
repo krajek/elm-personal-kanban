@@ -14,6 +14,7 @@ type Action
     = NoOp
     | TaskColumnAction TaskColumn.Action
     | AddNewTaskToBoardRequest
+    | PopupAction AddTaskPopup.Action
 
 -- MODEL
 
@@ -70,6 +71,14 @@ update action model =
       in
         (newModel, Effects.none)
 
+    PopupAction popupAction ->
+      let
+        newModel =
+          { model
+          | popup = AddTaskPopup.update popupAction model.popup }
+      in
+        (newModel, Effects.none)
+
 -- VIEW
 
 tableStyle : Attribute
@@ -110,4 +119,4 @@ view address model =
   in
     span []
       [ table [tableStyle] [headersRow, cellsRow]
-      , AddTaskPopup.view model.popup ]
+      , AddTaskPopup.view (Signal.forwardTo address PopupAction) model.popup ]

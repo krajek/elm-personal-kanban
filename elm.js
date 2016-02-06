@@ -11824,6 +11824,7 @@ Elm.AddTaskPopup.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
@@ -11844,14 +11845,22 @@ Elm.AddTaskPopup.make = function (_elm) {
                                             ,{ctor: "_Tuple2",_0: "z-index",_1: "1002"}
                                             ,{ctor: "_Tuple2",_0: "overflow",_1: "auto"}]));
    };
-   var view = function (model) {
-      return A2($Html.div,
-      _U.list([windowStyle(model.visible)]),
-      _U.list([]));
-   };
    var update = F2(function (action,model) {
       var _p0 = action;
-      return _U.update(model,{visible: true});
+      if (_p0.ctor === "Show") {
+            return _U.update(model,{visible: true});
+         } else {
+            return _U.update(model,{visible: false});
+         }
+   });
+   var Cancel = {ctor: "Cancel"};
+   var view = F2(function (address,model) {
+      var popupContent = A2($Html.button,
+      _U.list([A2($Html$Events.onClick,address,Cancel)]),
+      _U.list([$Html.text("Cancel")]));
+      return A2($Html.div,
+      _U.list([windowStyle(model.visible)]),
+      _U.list([popupContent]));
    });
    var Show = {ctor: "Show"};
    var init = {visible: false};
@@ -11995,7 +12004,8 @@ Elm.PersonalKanban.make = function (_elm) {
          case "TaskColumnAction": return {ctor: "_Tuple2"
                                          ,_0: model
                                          ,_1: $Effects.none};
-         default: var updateFirstColumn = F2(function (index,_p1) {
+         case "AddNewTaskToBoardRequest":
+         var updateFirstColumn = F2(function (index,_p1) {
               var _p2 = _p1;
               var _p4 = _p2._0;
               var _p3 = _p2._1;
@@ -12013,6 +12023,9 @@ Elm.PersonalKanban.make = function (_elm) {
            ,popup: A2($AddTaskPopup.update,
            $AddTaskPopup.Show,
            model.popup)});
+           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
+         default: var newModel = _U.update(model,
+           {popup: A2($AddTaskPopup.update,_p0._0,model.popup)});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
    });
    var initColumns = function () {
@@ -12034,6 +12047,9 @@ Elm.PersonalKanban.make = function (_elm) {
    var Model = F2(function (a,b) {
       return {columns: a,popup: b};
    });
+   var PopupAction = function (a) {
+      return {ctor: "PopupAction",_0: a};
+   };
    var AddNewTaskToBoardRequest = {ctor: "AddNewTaskToBoardRequest"};
    var TaskColumnAction = function (a) {
       return {ctor: "TaskColumnAction",_0: a};
@@ -12069,13 +12085,16 @@ Elm.PersonalKanban.make = function (_elm) {
       _U.list([A2($Html.table,
               _U.list([tableStyle]),
               _U.list([headersRow,cellsRow]))
-              ,$AddTaskPopup.view(model.popup)]));
+              ,A2($AddTaskPopup.view,
+              A2($Signal.forwardTo,address,PopupAction),
+              model.popup)]));
    });
    var NoOp = {ctor: "NoOp"};
    return _elm.PersonalKanban.values = {_op: _op
                                        ,NoOp: NoOp
                                        ,TaskColumnAction: TaskColumnAction
                                        ,AddNewTaskToBoardRequest: AddNewTaskToBoardRequest
+                                       ,PopupAction: PopupAction
                                        ,Model: Model
                                        ,initColumns: initColumns
                                        ,init: init

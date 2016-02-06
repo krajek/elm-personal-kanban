@@ -2,6 +2,7 @@ module AddTaskPopup(Model, init, Action(Show), update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 
 -- MODEL
 
@@ -17,11 +18,13 @@ init =
 
 type Action
   = Show
+  | Cancel
 
 update : Action -> Model -> Model
 update action model =
   case action of
     Show -> { model | visible = True }
+    Cancel -> { model | visible = False}
 
 -- VIEW
 
@@ -40,6 +43,9 @@ windowStyle visible =
     , ("z-index", "1002")
     , ("overflow",  "auto")]
 
-view :  Model -> Html
-view model =
-  div [ windowStyle model.visible] []
+view :  Signal.Address Action -> Model -> Html
+view address model =
+  let
+    popupContent = button [onClick address Cancel] [text "Cancel"]
+  in
+    div [windowStyle model.visible] [popupContent]

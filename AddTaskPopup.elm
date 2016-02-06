@@ -47,6 +47,21 @@ windowStyle visible =
     , ("z-index", "1002")
     , ("overflow",  "auto")]
 
+overlayStyle visible =
+  style
+  [ ("display", if visible then "block" else "none"),
+    ("position", "absolute"),
+    ("left", "0%"),
+    ("top", "0%"),
+    ("width", "100%"),
+    ("height", "100%"),
+    ("z-index", "1001"),
+    ("background-color", "black"),
+    ("opacity",".80"),
+    ("-moz-opacity", "0.8"),
+    ("filter", "alpha(opacity=80)")
+    ]
+
 type alias Context =
   { addTaskAddress : Signal.Address String }
 
@@ -63,4 +78,6 @@ view context address model =
     addButton = button [onClick context.addTaskAddress model.taskDescription] [text "Add"]
     popupContent = div [] [taskInput, addButton, cancelButton]
   in
-    div [windowStyle model.visible] [popupContent]
+    div []
+      [ div [windowStyle model.visible] [popupContent]
+      , div [overlayStyle model.visible] [] ]

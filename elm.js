@@ -11831,6 +11831,21 @@ Elm.AddTaskPopup.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
    var Context = function (a) {    return {addTaskAddress: a};};
+   var overlayStyle = function (visible) {
+      return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                             ,_0: "display"
+                                             ,_1: visible ? "block" : "none"}
+                                            ,{ctor: "_Tuple2",_0: "position",_1: "absolute"}
+                                            ,{ctor: "_Tuple2",_0: "left",_1: "0%"}
+                                            ,{ctor: "_Tuple2",_0: "top",_1: "0%"}
+                                            ,{ctor: "_Tuple2",_0: "width",_1: "100%"}
+                                            ,{ctor: "_Tuple2",_0: "height",_1: "100%"}
+                                            ,{ctor: "_Tuple2",_0: "z-index",_1: "1001"}
+                                            ,{ctor: "_Tuple2",_0: "background-color",_1: "black"}
+                                            ,{ctor: "_Tuple2",_0: "opacity",_1: ".80"}
+                                            ,{ctor: "_Tuple2",_0: "-moz-opacity",_1: "0.8"}
+                                            ,{ctor: "_Tuple2",_0: "filter",_1: "alpha(opacity=80)"}]));
+   };
    var windowStyle = function (visible) {
       return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                              ,_0: "position"
@@ -11873,8 +11888,13 @@ Elm.AddTaskPopup.make = function (_elm) {
       _U.list([]),
       _U.list([taskInput,addButton,cancelButton]));
       return A2($Html.div,
-      _U.list([windowStyle(model.visible)]),
-      _U.list([popupContent]));
+      _U.list([]),
+      _U.list([A2($Html.div,
+              _U.list([windowStyle(model.visible)]),
+              _U.list([popupContent]))
+              ,A2($Html.div,
+              _U.list([overlayStyle(model.visible)]),
+              _U.list([]))]));
    });
    var Show = {ctor: "Show"};
    var init = {visible: false,taskDescription: ""};

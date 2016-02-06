@@ -7,6 +7,7 @@ import TaskColumn
 import TaskHeader
 import AddTaskPopup
 
+
 -- ACTION
 
 type Action
@@ -17,17 +18,26 @@ type Action
 -- MODEL
 
 type alias Model =
-    { columns : List (TaskHeader.Model, TaskColumn.Model) }
+    { columns : List (TaskHeader.Model, TaskColumn.Model)
+    , popup : AddTaskPopup.Model }
+
+
+initColumns : List (TaskHeader.Model, TaskColumn.Model)
+initColumns =
+  let
+    todoColumn = ( {name = "To do" }, { tasks = ["Fake task"] })
+    inProgressColumn = ( {name = "In progress" }, { tasks = ["Fake task"] })
+    doneColumn = ( {name = "Done"}, { tasks = ["Fake task"] })
+  in
+    [todoColumn, inProgressColumn, doneColumn]
 
 
 init : (Model, Effects Action)
 init =
   let
-    todoColumn = ( {name = "To do" }, { tasks = ["Fake task"] })
-    inProgressColumn = ( {name = "In progress" }, { tasks = ["Fake task"] })
-    doneColumn = ( {name = "Done"}, { tasks = ["Fake task"] })
     model =
-      { columns = [todoColumn, inProgressColumn, doneColumn] }
+      { columns = initColumns
+      , popup = AddTaskPopup.init }
   in
     ( model, Effects.none )
 
@@ -53,8 +63,10 @@ update action model =
         newColumns : List (TaskHeader.Model, TaskColumn.Model)
         newColumns = List.indexedMap updateFirstColumn model.columns
         newModel : Model
-        newModel = { model | columns = newColumns }
-
+        newModel =
+          { model
+          | columns = newColumns
+          , popup = AddTaskPopup.update AddTaskPopup.Show model.popup }
       in
         (newModel, Effects.none)
 
@@ -96,4 +108,6 @@ view address model =
     headersRow = tr [headerStyle] <| List.map viewHeader (List.map fst model.columns)
     cellsRow = tr [] <| List.map viewColumnCell (List.map snd model.columns)
   in
-    table [tableStyle] [headersRow, cellsRow]
+    span []
+      [ table [tableStyle] [headersRow, cellsRow]
+      , AddTaskPopup.view model.popup ]

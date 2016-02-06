@@ -1,4 +1,4 @@
-module AddTaskPopup(Model, init, Action, view) where
+module AddTaskPopup(Model, init, Action(Show), update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -28,8 +28,8 @@ update action model =
 windowStyle :  Bool -> Attribute
 windowStyle visible =
   style
-    [ ("display", if visible then "fixed" else "none")
-    , ("position", "absolute")
+    [ ("position", "absolute")
+    , ("display", if visible then "block" else "none")
     , ("top",  "25%")
     , ("left",  "25%")
     , ("width",  "50%")
@@ -40,6 +40,6 @@ windowStyle visible =
     , ("z-index", "1002")
     , ("overflow",  "auto")]
 
-view :  Signal.Address -> Model -> Html
-view address model =
-  div [windowStyle model.visible] []
+view :  Model -> Html
+view model =
+  div [ windowStyle model.visible] []

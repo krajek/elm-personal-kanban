@@ -1,4 +1,4 @@
-module AddTaskPopup(Model, init, Action(Show), update, view) where
+module AddTaskPopup(Model, init, Action(Show, Hide), update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -20,14 +20,14 @@ init =
 
 type Action
   = Show
-  | Cancel
+  | Hide
   | TaskDescription String
 
 update : Action -> Model -> Model
 update action model =
   case action of
     Show -> { model | visible = True }
-    Cancel -> { model | visible = False}
+    Hide -> { model | visible = False}
     TaskDescription desc -> { model | taskDescription = desc }
 
 -- VIEW
@@ -47,10 +47,11 @@ windowStyle visible =
     , ("z-index", "1002")
     , ("overflow",  "auto")]
 
+type alias Context =
+  { addTaskAddress : Signal.Address String }
 
-
-view :  Signal.Address Action -> Model -> Html
-view address model =
+view : Context -> Signal.Address Action -> Model -> Html
+view context address model =
   let
     taskInput = input
         [ placeholder "Enter task description"
@@ -58,7 +59,8 @@ view address model =
         , on "input" targetValue (Signal.message address << TaskDescription)
         ]
         []
-    cancelButton = button [onClick address Cancel] [text "Cancel"]
-    popupContent = div [] [taskInput, cancelButton]
+    cancelButton = button [onClick address Hide] [text "Cancel"]
+    addButton = button [onClick context.addTaskAddress model.taskDescription] [text "Add"]
+    popupContent = div [] [taskInput, addButton, cancelButton]
   in
     div [windowStyle model.visible] [popupContent]

@@ -15,6 +15,7 @@ type Action
     | TaskColumnAction TaskColumn.Action
     | AddNewTaskToBoardRequest
     | PopupAction AddTaskPopup.Action
+    | AddNewTaskToBoard String
 
 -- MODEL
 
@@ -56,9 +57,17 @@ update action model =
 
     AddNewTaskToBoardRequest ->
       let
+        newModel =
+          { model
+          | popup = AddTaskPopup.update AddTaskPopup.Show model.popup }
+      in
+        (newModel, Effects.none)
+
+    AddNewTaskToBoard desc ->
+      let
         updateFirstColumn index (headerModel, columnModel) =
           if index == 0 then
-            (headerModel, TaskColumn.update (TaskColumn.AddTask "New task") columnModel)
+            (headerModel, TaskColumn.update (TaskColumn.AddTask desc) columnModel)
           else
             (headerModel, columnModel)
         newColumns : List (TaskHeader.Model, TaskColumn.Model)
@@ -67,7 +76,7 @@ update action model =
         newModel =
           { model
           | columns = newColumns
-          , popup = AddTaskPopup.update AddTaskPopup.Show model.popup }
+          , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
       in
         (newModel, Effects.none)
 
@@ -116,7 +125,9 @@ view address model =
           [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]
     headersRow = tr [headerStyle] <| List.map viewHeader (List.map fst model.columns)
     cellsRow = tr [] <| List.map viewColumnCell (List.map snd model.columns)
+    popupContext = { addTaskAddress = Signal.forwardTo address AddNewTaskToBoard }
+    popup = AddTaskPopup.view  popupContext (Signal.forwardTo address PopupAction) model.popup
   in
     span []
       [ table [tableStyle] [headersRow, cellsRow]
-      , AddTaskPopup.view (Signal.forwardTo address PopupAction) model.popup ]
+      , popup ]

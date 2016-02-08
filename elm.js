@@ -11926,20 +11926,18 @@ Elm.TaskBox.make = function (_elm) {
    $Debug = Elm.Debug.make(_elm),
    $Html = Elm.Html.make(_elm),
    $Html$Attributes = Elm.Html.Attributes.make(_elm),
+   $Html$Events = Elm.Html.Events.make(_elm),
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
-   var taskStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
-                                                   ,_0: "border"
-                                                   ,_1: "1px solid black"}
-                                                  ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}
-                                                  ,{ctor: "_Tuple2",_0: "cursor",_1: "pointer"}]));
-   var view = function (model) {
-      return A2($Html.p,
-      _U.list([taskStyle]),
-      _U.list([$Html.text(model.description)]));
+   var taskStyle = function (mouseOver) {
+      return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                             ,_0: "border"
+                                             ,_1: mouseOver ? "1px solid red" : "1px solid black"}
+                                            ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}
+                                            ,{ctor: "_Tuple2",_0: "cursor",_1: "pointer"}]));
    };
    var update = F2(function (action,model) {
       var _p0 = action;
@@ -11951,6 +11949,18 @@ Elm.TaskBox.make = function (_elm) {
    });
    var OnMouseLeave = {ctor: "OnMouseLeave"};
    var OnMouseEnter = {ctor: "OnMouseEnter"};
+   var view = F2(function (address,model) {
+      var leave = A2($Html$Events.onMouseLeave,
+      address,
+      OnMouseLeave);
+      var enter = A2($Html$Events.onMouseEnter,address,OnMouseEnter);
+      var attributes = _U.list([taskStyle(model.mouseOver)
+                               ,enter
+                               ,leave]);
+      return A2($Html.p,
+      attributes,
+      _U.list([$Html.text(model.description)]));
+   });
    var withDescription = function (description) {
       return {description: description,mouseOver: false};
    };
@@ -11977,22 +11987,35 @@ Elm.TaskColumn.make = function (_elm) {
    $Signal = Elm.Signal.make(_elm),
    $TaskBox = Elm.TaskBox.make(_elm);
    var _op = {};
-   var view = F2(function (address,model) {
-      var tasks = A2($List.map,$TaskBox.view,model.tasks);
-      return A2($Html.section,_U.list([]),tasks);
-   });
    var update = F2(function (action,model) {
       var _p0 = action;
-      var netTask = $TaskBox.withDescription(_p0._0);
-      return _U.update(model,
-      {tasks: A2($Basics._op["++"],model.tasks,_U.list([netTask]))});
+      if (_p0.ctor === "AddTask") {
+            var netTask = $TaskBox.withDescription(_p0._0);
+            return _U.update(model,
+            {tasks: A2($Basics._op["++"],model.tasks,_U.list([netTask]))});
+         } else {
+            return model;
+         }
    });
    var Model = function (a) {    return {tasks: a};};
+   var TaskBoxAction = function (a) {
+      return {ctor: "TaskBoxAction",_0: a};
+   };
+   var view = F2(function (address,model) {
+      var taskBoxAddress = A2($Signal.forwardTo,
+      address,
+      TaskBoxAction);
+      var tasks = A2($List.map,
+      $TaskBox.view(taskBoxAddress),
+      model.tasks);
+      return A2($Html.section,_U.list([]),tasks);
+   });
    var AddTask = function (a) {
       return {ctor: "AddTask",_0: a};
    };
    return _elm.TaskColumn.values = {_op: _op
                                    ,AddTask: AddTask
+                                   ,TaskBoxAction: TaskBoxAction
                                    ,Model: Model
                                    ,update: update
                                    ,view: view};

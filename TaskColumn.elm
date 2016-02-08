@@ -4,8 +4,9 @@ import Html exposing (..)
 import Html.Attributes exposing (style)
 import TaskBox
 
-type Action =
-  AddTask String
+type Action
+  = AddTask String
+  | TaskBoxAction TaskBox.Action
 
 type alias Model =
   { tasks : List TaskBox.Model }
@@ -20,9 +21,12 @@ update action model =
         { model
         | tasks = model.tasks ++ [netTask]}
 
+    TaskBoxAction taskBoxAction ->
+      model
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    tasks = List.map TaskBox.view model.tasks
+    taskBoxAddress = Signal.forwardTo address TaskBoxAction
+    tasks = List.map (TaskBox.view taskBoxAddress)  model.tasks
   in
     section [] tasks

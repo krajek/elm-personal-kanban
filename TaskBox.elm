@@ -2,6 +2,7 @@ module TaskBox(Model, withDescription, Action, view) where
 
 import Html exposing (p, Html, text)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onMouseEnter, onMouseLeave)
 
 -- MODEL
 
@@ -28,12 +29,17 @@ update action model =
 
 -- VIEW
 
-taskStyle =
+taskStyle mouseOver =
   style
-  [ ("border", "1px solid black")
+  [ ("border", if mouseOver then "1px solid red" else "1px solid black")
   , ("margin", "20px 10px")
   , ("cursor", "pointer")]
 
-view : Model -> Html
-view model =
-  p [taskStyle] [text model.description]
+view : Signal.Address Action -> Model -> Html
+view address model =
+  let
+    enter = onMouseEnter address OnMouseEnter
+    leave = onMouseLeave address OnMouseLeave
+    attributes = [taskStyle model.mouseOver, enter, leave]
+  in
+    p attributes [text model.description]

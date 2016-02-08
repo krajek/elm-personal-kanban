@@ -27,9 +27,10 @@ type alias Model =
 initColumns : List (TaskHeader.Model, TaskColumn.Model)
 initColumns =
   let
-    todoColumn = ( {name = "To do" }, { tasks = ["Fake task"] })
-    inProgressColumn = ( {name = "In progress" }, { tasks = ["Fake task"] })
-    doneColumn = ( {name = "Done"}, { tasks = ["Fake task"] })
+    fakeTask = { description = "Fake task "}
+    todoColumn = ( {name = "To do" }, { tasks = [fakeTask] })
+    inProgressColumn = ( {name = "In progress" }, { tasks = [fakeTask] })
+    doneColumn = ( {name = "Done"}, { tasks = [fakeTask] })
   in
     [todoColumn, inProgressColumn, doneColumn]
 

@@ -11916,11 +11916,11 @@ Elm.AddTaskPopup.make = function (_elm) {
                                      ,Show: Show
                                      ,Hide: Hide};
 };
-Elm.TaskColumn = Elm.TaskColumn || {};
-Elm.TaskColumn.make = function (_elm) {
+Elm.TaskBox = Elm.TaskBox || {};
+Elm.TaskBox.make = function (_elm) {
    "use strict";
-   _elm.TaskColumn = _elm.TaskColumn || {};
-   if (_elm.TaskColumn.values) return _elm.TaskColumn.values;
+   _elm.TaskBox = _elm.TaskBox || {};
+   if (_elm.TaskBox.values) return _elm.TaskBox.values;
    var _U = Elm.Native.Utils.make(_elm),
    $Basics = Elm.Basics.make(_elm),
    $Debug = Elm.Debug.make(_elm),
@@ -11936,19 +11936,41 @@ Elm.TaskColumn.make = function (_elm) {
                                                    ,_1: "1px solid black"}
                                                   ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}
                                                   ,{ctor: "_Tuple2",_0: "cursor",_1: "pointer"}]));
+   var view = function (model) {
+      return A2($Html.p,
+      _U.list([taskStyle]),
+      _U.list([$Html.text(model.description)]));
+   };
+   var Model = function (a) {    return {description: a};};
+   return _elm.TaskBox.values = {_op: _op
+                                ,Model: Model
+                                ,taskStyle: taskStyle
+                                ,view: view};
+};
+Elm.TaskColumn = Elm.TaskColumn || {};
+Elm.TaskColumn.make = function (_elm) {
+   "use strict";
+   _elm.TaskColumn = _elm.TaskColumn || {};
+   if (_elm.TaskColumn.values) return _elm.TaskColumn.values;
+   var _U = Elm.Native.Utils.make(_elm),
+   $Basics = Elm.Basics.make(_elm),
+   $Debug = Elm.Debug.make(_elm),
+   $Html = Elm.Html.make(_elm),
+   $List = Elm.List.make(_elm),
+   $Maybe = Elm.Maybe.make(_elm),
+   $Result = Elm.Result.make(_elm),
+   $Signal = Elm.Signal.make(_elm),
+   $TaskBox = Elm.TaskBox.make(_elm);
+   var _op = {};
    var view = F2(function (address,model) {
-      var viewTask = function (content) {
-         return A2($Html.p,
-         _U.list([taskStyle]),
-         _U.list([$Html.text(content)]));
-      };
-      var tasks = A2($List.map,viewTask,model.tasks);
+      var tasks = A2($List.map,$TaskBox.view,model.tasks);
       return A2($Html.section,_U.list([]),tasks);
    });
    var update = F2(function (action,model) {
       var _p0 = action;
+      var netTask = {description: _p0._0};
       return _U.update(model,
-      {tasks: A2($Basics._op["++"],model.tasks,_U.list([_p0._0]))});
+      {tasks: A2($Basics._op["++"],model.tasks,_U.list([netTask]))});
    });
    var Model = function (a) {    return {tasks: a};};
    var AddTask = function (a) {
@@ -11958,7 +11980,6 @@ Elm.TaskColumn.make = function (_elm) {
                                    ,AddTask: AddTask
                                    ,Model: Model
                                    ,update: update
-                                   ,taskStyle: taskStyle
                                    ,view: view};
 };
 Elm.TaskHeader = Elm.TaskHeader || {};
@@ -12078,15 +12099,16 @@ Elm.PersonalKanban.make = function (_elm) {
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
    });
    var initColumns = function () {
-      var doneColumn = {ctor: "_Tuple2"
-                       ,_0: {name: "Done"}
-                       ,_1: {tasks: _U.list(["Fake task"])}};
-      var inProgressColumn = {ctor: "_Tuple2"
-                             ,_0: {name: "In progress"}
-                             ,_1: {tasks: _U.list(["Fake task"])}};
+      var fakeTask = {description: "Fake task "};
       var todoColumn = {ctor: "_Tuple2"
                        ,_0: {name: "To do"}
-                       ,_1: {tasks: _U.list(["Fake task"])}};
+                       ,_1: {tasks: _U.list([fakeTask])}};
+      var inProgressColumn = {ctor: "_Tuple2"
+                             ,_0: {name: "In progress"}
+                             ,_1: {tasks: _U.list([fakeTask])}};
+      var doneColumn = {ctor: "_Tuple2"
+                       ,_0: {name: "Done"}
+                       ,_1: {tasks: _U.list([fakeTask])}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);
    }();
    var init = function () {

@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import TaskColumn
 import TaskHeader
+import TaskBox
 import AddTaskPopup
 
 
@@ -27,7 +28,7 @@ type alias Model =
 initColumns : List (TaskHeader.Model, TaskColumn.Model)
 initColumns =
   let
-    fakeTask = { description = "Fake task "}
+    fakeTask = TaskBox.withDescription "Fake task"
     todoColumn = ( {name = "To do" }, { tasks = [fakeTask] })
     inProgressColumn = ( {name = "In progress" }, { tasks = [fakeTask] })
     doneColumn = ( {name = "Done"}, { tasks = [fakeTask] })

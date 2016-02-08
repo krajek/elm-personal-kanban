@@ -1,10 +1,30 @@
-module TaskBox where
+module TaskBox(Model, withDescription, Action, view) where
 
 import Html exposing (p, Html, text)
 import Html.Attributes exposing (style)
 
+-- MODEL
+
 type alias Model =
-  { description : String }
+  { description : String
+  , mouseOver : Bool }
+
+withDescription description =
+  { description = description
+  , mouseOver = False }
+
+-- UPDATE
+
+type Action
+  = OnMouseEnter
+  | OnMouseLeave
+
+update : Action -> Model -> Model
+update action model =
+  case action of
+    OnMouseEnter -> { model | mouseOver = True }
+    OnMouseLeave -> { model | mouseOver = False }
+
 
 -- VIEW
 

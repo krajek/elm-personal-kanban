@@ -15,7 +15,7 @@ update action model =
   case action of
     AddTask content ->
       let
-        netTask = { description = content }
+        netTask = TaskBox.withDescription content
       in
         { model
         | tasks = model.tasks ++ [netTask]}

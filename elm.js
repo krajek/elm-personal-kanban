@@ -11941,11 +11941,26 @@ Elm.TaskBox.make = function (_elm) {
       _U.list([taskStyle]),
       _U.list([$Html.text(model.description)]));
    };
-   var Model = function (a) {    return {description: a};};
+   var update = F2(function (action,model) {
+      var _p0 = action;
+      if (_p0.ctor === "OnMouseEnter") {
+            return _U.update(model,{mouseOver: true});
+         } else {
+            return _U.update(model,{mouseOver: false});
+         }
+   });
+   var OnMouseLeave = {ctor: "OnMouseLeave"};
+   var OnMouseEnter = {ctor: "OnMouseEnter"};
+   var withDescription = function (description) {
+      return {description: description,mouseOver: false};
+   };
+   var Model = F2(function (a,b) {
+      return {description: a,mouseOver: b};
+   });
    return _elm.TaskBox.values = {_op: _op
-                                ,Model: Model
-                                ,taskStyle: taskStyle
-                                ,view: view};
+                                ,withDescription: withDescription
+                                ,view: view
+                                ,Model: Model};
 };
 Elm.TaskColumn = Elm.TaskColumn || {};
 Elm.TaskColumn.make = function (_elm) {
@@ -11968,7 +11983,7 @@ Elm.TaskColumn.make = function (_elm) {
    });
    var update = F2(function (action,model) {
       var _p0 = action;
-      var netTask = {description: _p0._0};
+      var netTask = $TaskBox.withDescription(_p0._0);
       return _U.update(model,
       {tasks: A2($Basics._op["++"],model.tasks,_U.list([netTask]))});
    });
@@ -12041,6 +12056,7 @@ Elm.PersonalKanban.make = function (_elm) {
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm),
+   $TaskBox = Elm.TaskBox.make(_elm),
    $TaskColumn = Elm.TaskColumn.make(_elm),
    $TaskHeader = Elm.TaskHeader.make(_elm);
    var _op = {};
@@ -12099,7 +12115,7 @@ Elm.PersonalKanban.make = function (_elm) {
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
    });
    var initColumns = function () {
-      var fakeTask = {description: "Fake task "};
+      var fakeTask = $TaskBox.withDescription("Fake task");
       var todoColumn = {ctor: "_Tuple2"
                        ,_0: {name: "To do"}
                        ,_1: {tasks: _U.list([fakeTask])}};

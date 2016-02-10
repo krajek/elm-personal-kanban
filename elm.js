@@ -11990,14 +11990,19 @@ Elm.TaskColumn.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       if (_p0.ctor === "AddTask") {
-            var netTask = $TaskBox.withDescription(_p0._0);
+            var newTask = {ctor: "_Tuple2"
+                          ,_0: model.nextTaskID
+                          ,_1: $TaskBox.withDescription(_p0._0)};
             return _U.update(model,
-            {tasks: A2($Basics._op["++"],model.tasks,_U.list([netTask]))});
+            {tasks: A2($Basics._op["++"],model.tasks,_U.list([newTask]))
+            ,nextTaskID: model.nextTaskID + 1});
          } else {
             return model;
          }
    });
-   var Model = function (a) {    return {tasks: a};};
+   var Model = F2(function (a,b) {
+      return {tasks: a,nextTaskID: b};
+   });
    var TaskBoxAction = function (a) {
       return {ctor: "TaskBoxAction",_0: a};
    };
@@ -12006,7 +12011,9 @@ Elm.TaskColumn.make = function (_elm) {
       address,
       TaskBoxAction);
       var tasks = A2($List.map,
-      $TaskBox.view(taskBoxAddress),
+      function (_p1) {
+         return A2($TaskBox.view,taskBoxAddress,$Basics.snd(_p1));
+      },
       model.tasks);
       return A2($Html.section,_U.list([]),tasks);
    });
@@ -12141,13 +12148,16 @@ Elm.PersonalKanban.make = function (_elm) {
       var fakeTask = $TaskBox.withDescription("Fake task");
       var todoColumn = {ctor: "_Tuple2"
                        ,_0: {name: "To do"}
-                       ,_1: {tasks: _U.list([fakeTask])}};
+                       ,_1: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+                            ,nextTaskID: 2}};
       var inProgressColumn = {ctor: "_Tuple2"
                              ,_0: {name: "In progress"}
-                             ,_1: {tasks: _U.list([fakeTask])}};
+                             ,_1: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+                                  ,nextTaskID: 2}};
       var doneColumn = {ctor: "_Tuple2"
                        ,_0: {name: "Done"}
-                       ,_1: {tasks: _U.list([fakeTask])}};
+                       ,_1: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+                            ,nextTaskID: 2}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);
    }();
    var init = function () {

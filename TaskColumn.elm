@@ -9,24 +9,28 @@ type Action
   | TaskBoxAction TaskBox.Action
 
 type alias Model =
-  { tasks : List TaskBox.Model }
+  { tasks : List (Int, TaskBox.Model)
+  , nextTaskID : Int }
 
 update : Action -> Model -> Model
 update action model =
   case action of
     AddTask content ->
       let
-        netTask = TaskBox.withDescription content
+        newTask = (model.nextTaskID, TaskBox.withDescription content)
       in
         { model
-        | tasks = model.tasks ++ [netTask]}
+        | tasks = model.tasks ++ [newTask]
+        , nextTaskID = model.nextTaskID + 1 }
 
     TaskBoxAction taskBoxAction ->
       model
+
+
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
     taskBoxAddress = Signal.forwardTo address TaskBoxAction
-    tasks = List.map (TaskBox.view taskBoxAddress)  model.tasks
+    tasks = List.map (snd >> (TaskBox.view taskBoxAddress)) model.tasks
   in
     section [] tasks

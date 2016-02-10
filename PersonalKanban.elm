@@ -29,9 +29,15 @@ initColumns : List (TaskHeader.Model, TaskColumn.Model)
 initColumns =
   let
     fakeTask = TaskBox.withDescription "Fake task"
-    todoColumn = ( {name = "To do" }, { tasks = [fakeTask] })
-    inProgressColumn = ( {name = "In progress" }, { tasks = [fakeTask] })
-    doneColumn = ( {name = "Done"}, { tasks = [fakeTask] })
+    todoColumn =
+      ( { name = "To do" }
+      , { tasks = [(1, fakeTask)], nextTaskID = 2 })
+    inProgressColumn =
+      ( { name = "In progress" }
+      , { tasks = [(1, fakeTask)], nextTaskID = 2 })
+    doneColumn =
+      ( { name = "Done"}
+      , { tasks = [(1, fakeTask)], nextTaskID = 2  })
   in
     [todoColumn, inProgressColumn, doneColumn]
 

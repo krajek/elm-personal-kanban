@@ -1,4 +1,4 @@
-module TaskBox(Model, withDescription, Action, view) where
+module TaskBox(Model, withDescription, Action, update, view) where
 
 import Html exposing (p, Html, text)
 import Html.Attributes exposing (style)

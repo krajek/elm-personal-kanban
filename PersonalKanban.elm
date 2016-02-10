@@ -61,7 +61,21 @@ update action model =
       (model, Effects.none)
 
     TaskColumnAction columnAction ->
-      (model, Effects.none)
+      let
+        updateColumn (h, c) =
+          (h, TaskColumn.update columnAction c)
+        newColumns =
+          case model.columns of
+            [] -> model.columns
+            c :: rest -> (updateColumn c) :: rest
+        newModel =
+          { model
+          | columns = newColumns }
+      in
+        (newModel, Effects.none)
+
+
+
 
     AddNewTaskToBoardRequest ->
       let

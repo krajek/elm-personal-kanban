@@ -18,13 +18,22 @@ update action model =
     AddTask content ->
       let
         newTask = (model.nextTaskID, TaskBox.withDescription content)
+        newModel =
+            { model
+            | tasks = model.tasks ++ [newTask]
+            , nextTaskID = model.nextTaskID + 1 }
       in
-        { model
-        | tasks = model.tasks ++ [newTask]
-        , nextTaskID = model.nextTaskID + 1 }
 
     TaskBoxAction taskId taskBoxAction ->
-      model
+      let
+        updateTask (id, task) =
+          if taskId == id
+            then (id, TaskBox.update taskBoxAction task)
+            else (id, task)
+        newModel =
+          { model
+          | tasks = List.map updateTask model.tasks }
+      in
 
 
 view : Signal.Address Action -> Model -> Html

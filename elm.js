@@ -11969,6 +11969,7 @@ Elm.TaskBox.make = function (_elm) {
    });
    return _elm.TaskBox.values = {_op: _op
                                 ,withDescription: withDescription
+                                ,update: update
                                 ,view: view
                                 ,Model: Model};
 };
@@ -11993,11 +11994,24 @@ Elm.TaskColumn.make = function (_elm) {
             var newTask = {ctor: "_Tuple2"
                           ,_0: model.nextTaskID
                           ,_1: $TaskBox.withDescription(_p0._0)};
-            return _U.update(model,
+            var newModel = _U.update(model,
             {tasks: A2($Basics._op["++"],model.tasks,_U.list([newTask]))
             ,nextTaskID: model.nextTaskID + 1});
+            return newModel;
          } else {
-            return model;
+            var updateTask = function (_p1) {
+               var _p2 = _p1;
+               var _p4 = _p2._1;
+               var _p3 = _p2._0;
+               return _U.eq(_p0._0,_p3) ? {ctor: "_Tuple2"
+                                          ,_0: _p3
+                                          ,_1: A2($TaskBox.update,_p0._1,_p4)} : {ctor: "_Tuple2"
+                                                                                 ,_0: _p3
+                                                                                 ,_1: _p4};
+            };
+            var newModel = _U.update(model,
+            {tasks: A2($List.map,updateTask,model.tasks)});
+            return newModel;
          }
    });
    var Model = F2(function (a,b) {
@@ -12007,12 +12021,12 @@ Elm.TaskColumn.make = function (_elm) {
       return {ctor: "TaskBoxAction",_0: a,_1: b};
    });
    var view = F2(function (address,model) {
-      var viewTask = function (_p1) {
-         var _p2 = _p1;
+      var viewTask = function (_p5) {
+         var _p6 = _p5;
          var taskBoxAddress = A2($Signal.forwardTo,
          address,
-         TaskBoxAction(_p2._0));
-         return A2($TaskBox.view,taskBoxAddress,_p2._1);
+         TaskBoxAction(_p6._0));
+         return A2($TaskBox.view,taskBoxAddress,_p6._1);
       };
       var tasks = A2($List.map,viewTask,model.tasks);
       return A2($Html.section,_U.list([]),tasks);
@@ -12112,24 +12126,37 @@ Elm.PersonalKanban.make = function (_elm) {
       {case "NoOp": return {ctor: "_Tuple2"
                            ,_0: model
                            ,_1: $Effects.none};
-         case "TaskColumnAction": return {ctor: "_Tuple2"
-                                         ,_0: model
-                                         ,_1: $Effects.none};
+         case "TaskColumnAction": var updateColumn = function (_p1) {
+              var _p2 = _p1;
+              return {ctor: "_Tuple2"
+                     ,_0: _p2._0
+                     ,_1: A2($TaskColumn.update,_p0._0,_p2._1)};
+           };
+           var newColumns = function () {
+              var _p3 = model.columns;
+              if (_p3.ctor === "[]") {
+                    return model.columns;
+                 } else {
+                    return A2($List._op["::"],updateColumn(_p3._0),_p3._1);
+                 }
+           }();
+           var newModel = _U.update(model,{columns: newColumns});
+           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
          case "AddNewTaskToBoardRequest": var newModel = _U.update(model,
            {popup: A2($AddTaskPopup.update,
            $AddTaskPopup.Show,
            model.popup)});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
          case "AddNewTaskToBoard":
-         var updateFirstColumn = F2(function (index,_p1) {
-              var _p2 = _p1;
-              var _p4 = _p2._0;
-              var _p3 = _p2._1;
+         var updateFirstColumn = F2(function (index,_p4) {
+              var _p5 = _p4;
+              var _p7 = _p5._0;
+              var _p6 = _p5._1;
               return _U.eq(index,0) ? {ctor: "_Tuple2"
-                                      ,_0: _p4
+                                      ,_0: _p7
                                       ,_1: A2($TaskColumn.update,
                                       $TaskColumn.AddTask(_p0._0),
-                                      _p3)} : {ctor: "_Tuple2",_0: _p4,_1: _p3};
+                                      _p6)} : {ctor: "_Tuple2",_0: _p7,_1: _p6};
            });
            var newColumns = A2($List.indexedMap,
            updateFirstColumn,

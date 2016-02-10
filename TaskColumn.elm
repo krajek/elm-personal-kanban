@@ -6,7 +6,7 @@ import TaskBox
 
 type Action
   = AddTask String
-  | TaskBoxAction TaskBox.Action
+  | TaskBoxAction Int TaskBox.Action
 
 type alias Model =
   { tasks : List (Int, TaskBox.Model)
@@ -23,14 +23,18 @@ update action model =
         | tasks = model.tasks ++ [newTask]
         , nextTaskID = model.nextTaskID + 1 }
 
-    TaskBoxAction taskBoxAction ->
+    TaskBoxAction taskId taskBoxAction ->
       model
 
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   let
-    taskBoxAddress = Signal.forwardTo address TaskBoxAction
-    tasks = List.map (snd >> (TaskBox.view taskBoxAddress)) model.tasks
+    viewTask (taskId, task) =
+      let
+        taskBoxAddress = Signal.forwardTo address <| TaskBoxAction taskId
+      in
+        TaskBox.view taskBoxAddress task
+    tasks = List.map viewTask model.tasks
   in
     section [] tasks

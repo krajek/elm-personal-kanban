@@ -12003,18 +12003,18 @@ Elm.TaskColumn.make = function (_elm) {
    var Model = F2(function (a,b) {
       return {tasks: a,nextTaskID: b};
    });
-   var TaskBoxAction = function (a) {
-      return {ctor: "TaskBoxAction",_0: a};
-   };
+   var TaskBoxAction = F2(function (a,b) {
+      return {ctor: "TaskBoxAction",_0: a,_1: b};
+   });
    var view = F2(function (address,model) {
-      var taskBoxAddress = A2($Signal.forwardTo,
-      address,
-      TaskBoxAction);
-      var tasks = A2($List.map,
-      function (_p1) {
-         return A2($TaskBox.view,taskBoxAddress,$Basics.snd(_p1));
-      },
-      model.tasks);
+      var viewTask = function (_p1) {
+         var _p2 = _p1;
+         var taskBoxAddress = A2($Signal.forwardTo,
+         address,
+         TaskBoxAction(_p2._0));
+         return A2($TaskBox.view,taskBoxAddress,_p2._1);
+      };
+      var tasks = A2($List.map,viewTask,model.tasks);
       return A2($Html.section,_U.list([]),tasks);
    });
    var AddTask = function (a) {

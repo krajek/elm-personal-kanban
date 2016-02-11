@@ -78,6 +78,10 @@ view context address model =
     addButton = button [onClick context.addTaskAddress model.taskDescription] [text "Add"]
     popupContent = div [] [taskInput, addButton, cancelButton]
   in
-    div []
-      [ div [windowStyle model.visible] [popupContent]
-      , div [overlayStyle model.visible] [] ]
+    if model.visible
+    then
+      div []
+        [ div [windowStyle model.visible] [popupContent]
+        , div [overlayStyle model.visible] [] ]
+    else
+      node "noscript" [] []

@@ -11887,14 +11887,17 @@ Elm.AddTaskPopup.make = function (_elm) {
       var popupContent = A2($Html.div,
       _U.list([]),
       _U.list([taskInput,addButton,cancelButton]));
-      return A2($Html.div,
+      return model.visible ? A2($Html.div,
       _U.list([]),
       _U.list([A2($Html.div,
               _U.list([windowStyle(model.visible)]),
               _U.list([popupContent]))
               ,A2($Html.div,
               _U.list([overlayStyle(model.visible)]),
-              _U.list([]))]));
+              _U.list([]))])) : A3($Html.node,
+      "noscript",
+      _U.list([]),
+      _U.list([]));
    });
    var Show = {ctor: "Show"};
    var init = {visible: false,taskDescription: ""};

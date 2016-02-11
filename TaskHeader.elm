@@ -6,7 +6,8 @@ import Html.Attributes exposing (style)
 
 
 type alias Model =
-  { name : String }
+  { name : String
+  , addActionAvailable : Bool }
 
 
 type alias Context =
@@ -24,6 +25,12 @@ buttonStyle =
 
 view : Context -> Model -> Html
 view context model =
-  span []
-    [ span [headerTextStyle] [text model.name]
-    , button [buttonStyle, onClick context.addTaskAddress ()] [text "+"]]
+  let
+    buttonPart =
+      if model.addActionAvailable
+        then [button [buttonStyle, onClick context.addTaskAddress ()] [text "+"]]
+        else []
+    labelPart = [ span [headerTextStyle] [text model.name] ]
+  in
+    span []
+      <| labelPart ++ buttonPart

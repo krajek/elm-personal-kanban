@@ -31,15 +31,15 @@ initColumns =
     fakeTask = TaskBox.withDescription "Fake task"
     todoColumn =
       ( 1
-      , { name = "To do" }
+      , { name = "To do", addActionAvailable = True }
       , { tasks = [(1, fakeTask)], nextTaskID = 2 })
     inProgressColumn =
       ( 2
-      , { name = "In progress" }
+      , { name = "In progress", addActionAvailable = False }
       , { tasks = [(1, fakeTask)], nextTaskID = 2 })
     doneColumn =
       ( 3
-      , { name = "Done"}
+      , { name = "Done", addActionAvailable = False }
       , { tasks = [(1, fakeTask)], nextTaskID = 2  })
   in
     [todoColumn, inProgressColumn, doneColumn]

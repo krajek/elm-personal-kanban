@@ -11849,10 +11849,10 @@ Elm.AddTaskPopup.make = function (_elm) {
                                                      ,_0: "position"
                                                      ,_1: "absolute"}
                                                     ,{ctor: "_Tuple2",_0: "display",_1: "block"}
-                                                    ,{ctor: "_Tuple2",_0: "top",_1: "25%"}
-                                                    ,{ctor: "_Tuple2",_0: "left",_1: "25%"}
-                                                    ,{ctor: "_Tuple2",_0: "width",_1: "50%"}
-                                                    ,{ctor: "_Tuple2",_0: "height",_1: "50%"}
+                                                    ,{ctor: "_Tuple2",_0: "top",_1: "40%"}
+                                                    ,{ctor: "_Tuple2",_0: "left",_1: "35%"}
+                                                    ,{ctor: "_Tuple2",_0: "width",_1: "30%"}
+                                                    ,{ctor: "_Tuple2",_0: "height",_1: "20%"}
                                                     ,{ctor: "_Tuple2",_0: "padding",_1: "16px"}
                                                     ,{ctor: "_Tuple2",_0: "border",_1: "16px solid orange"}
                                                     ,{ctor: "_Tuple2",_0: "background-color",_1: "white"}
@@ -11883,7 +11883,10 @@ Elm.AddTaskPopup.make = function (_elm) {
               })
               ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                                ,_0: "display"
-                                               ,_1: "block"}]))]),
+                                               ,_1: "block"}
+                                              ,{ctor: "_Tuple2",_0: "width",_1: "100%"}
+                                              ,{ctor: "_Tuple2",_0: "margin-bottom",_1: "1em"}]))
+              ,$Html$Attributes.rows(4)]),
       _U.list([]));
       var popupContent = A2($Html.div,
       _U.list([]),
@@ -12069,20 +12072,23 @@ Elm.TaskHeader.make = function (_elm) {
                                                          ,_0: "font-size"
                                                          ,_1: "x-large"}]));
    var view = F2(function (context,model) {
+      var labelPart = _U.list([A2($Html.span,
+      _U.list([headerTextStyle]),
+      _U.list([$Html.text(model.name)]))]);
+      var buttonPart = model.addActionAvailable ? _U.list([A2($Html.button,
+      _U.list([buttonStyle
+              ,A2($Html$Events.onClick,
+              context.addTaskAddress,
+              {ctor: "_Tuple0"})]),
+      _U.list([$Html.text("+")]))]) : _U.list([]);
       return A2($Html.span,
       _U.list([]),
-      _U.list([A2($Html.span,
-              _U.list([headerTextStyle]),
-              _U.list([$Html.text(model.name)]))
-              ,A2($Html.button,
-              _U.list([buttonStyle
-                      ,A2($Html$Events.onClick,
-                      context.addTaskAddress,
-                      {ctor: "_Tuple0"})]),
-              _U.list([$Html.text("+")]))]));
+      A2($Basics._op["++"],labelPart,buttonPart));
    });
    var Context = function (a) {    return {addTaskAddress: a};};
-   var Model = function (a) {    return {name: a};};
+   var Model = F2(function (a,b) {
+      return {name: a,addActionAvailable: b};
+   });
    return _elm.TaskHeader.values = {_op: _op
                                    ,view: view
                                    ,Model: Model};
@@ -12181,17 +12187,17 @@ Elm.PersonalKanban.make = function (_elm) {
       var fakeTask = $TaskBox.withDescription("Fake task");
       var todoColumn = {ctor: "_Tuple3"
                        ,_0: 1
-                       ,_1: {name: "To do"}
+                       ,_1: {name: "To do",addActionAvailable: true}
                        ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                             ,nextTaskID: 2}};
       var inProgressColumn = {ctor: "_Tuple3"
                              ,_0: 2
-                             ,_1: {name: "In progress"}
+                             ,_1: {name: "In progress",addActionAvailable: false}
                              ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                                   ,nextTaskID: 2}};
       var doneColumn = {ctor: "_Tuple3"
                        ,_0: 3
-                       ,_1: {name: "Done"}
+                       ,_1: {name: "Done",addActionAvailable: false}
                        ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                             ,nextTaskID: 2}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);

@@ -37,10 +37,10 @@ windowStyle =
   style
     [ ("position", "absolute")
     , ("display", "block")
-    , ("top",  "25%")
-    , ("left",  "25%")
-    , ("width",  "50%")
-    , ("height",  "50%")
+    , ("top",  "40%")
+    , ("left",  "35%")
+    , ("width",  "30%")
+    , ("height",  "20%")
     , ("padding",  "16px")
     , ("border",  "16px solid orange")
     , ("background-color",  "white")
@@ -72,7 +72,8 @@ view context address model =
         [ placeholder "Enter task description"
         , value model.taskDescription
         , on "input" targetValue (Signal.message address << TaskDescription)
-        , style [("display", "block")]
+        , style [("display", "block"), ("width", "100%"), ("margin-bottom", "1em")]
+        , rows 4
         ]
         []
     cancelButton = button [onClick address Hide] [text "Cancel"]

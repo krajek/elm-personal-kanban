@@ -23,6 +23,7 @@ update action model =
             | tasks = model.tasks ++ [newTask]
             , nextTaskID = model.nextTaskID + 1 }
       in
+        newModel
 
     TaskBoxAction taskId taskBoxAction ->
       let
@@ -34,6 +35,7 @@ update action model =
           { model
           | tasks = List.map updateTask model.tasks }
       in
+        newModel
 
 
 view : Signal.Address Action -> Model -> Html

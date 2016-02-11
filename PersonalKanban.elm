@@ -21,22 +21,25 @@ type Action
 -- MODEL
 
 type alias Model =
-    { columns : List (TaskHeader.Model, TaskColumn.Model)
+    { columns : List (Int, TaskHeader.Model, TaskColumn.Model)
     , popup : AddTaskPopup.Model }
 
 
-initColumns : List (TaskHeader.Model, TaskColumn.Model)
+initColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
 initColumns =
   let
     fakeTask = TaskBox.withDescription "Fake task"
     todoColumn =
-      ( { name = "To do" }
+      ( 1
+      , { name = "To do" }
       , { tasks = [(1, fakeTask)], nextTaskID = 2 })
     inProgressColumn =
-      ( { name = "In progress" }
+      ( 2
+      , { name = "In progress" }
       , { tasks = [(1, fakeTask)], nextTaskID = 2 })
     doneColumn =
-      ( { name = "Done"}
+      ( 3
+      , { name = "Done"}
       , { tasks = [(1, fakeTask)], nextTaskID = 2  })
   in
     [todoColumn, inProgressColumn, doneColumn]
@@ -62,8 +65,8 @@ update action model =
 
     TaskColumnAction columnAction ->
       let
-        updateColumn (h, c) =
-          (h, TaskColumn.update columnAction c)
+        updateColumn (id, h, c) =
+          (id, h, TaskColumn.update columnAction c)
         newColumns =
           case model.columns of
             [] -> model.columns
@@ -87,12 +90,12 @@ update action model =
 
     AddNewTaskToBoard desc ->
       let
-        updateFirstColumn index (headerModel, columnModel) =
+        updateFirstColumn index (id, headerModel, columnModel) =
           if index == 0 then
-            (headerModel, TaskColumn.update (TaskColumn.AddTask desc) columnModel)
+            (id, headerModel, TaskColumn.update (TaskColumn.AddTask desc) columnModel)
           else
-            (headerModel, columnModel)
-        newColumns : List (TaskHeader.Model, TaskColumn.Model)
+            (id, headerModel, columnModel)
+        newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
         newColumns = List.indexedMap updateFirstColumn model.columns
         newModel : Model
         newModel =
@@ -145,8 +148,8 @@ view address model =
     viewColumnCell column =
         td [cellStyle]
           [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]
-    headersRow = tr [headerStyle] <| List.map viewHeader (List.map fst model.columns)
-    cellsRow = tr [] <| List.map viewColumnCell (List.map snd model.columns)
+    headersRow = tr [headerStyle] <| List.map viewHeader (List.map (\ (_, h, _) -> h) model.columns)
+    cellsRow = tr [] <| List.map viewColumnCell (List.map (\ (_, _, c) -> c) model.columns)
     popupContext = { addTaskAddress = Signal.forwardTo address AddNewTaskToBoard }
     popup = AddTaskPopup.view  popupContext (Signal.forwardTo address PopupAction) model.popup
   in

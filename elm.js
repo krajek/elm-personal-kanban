@@ -12128,9 +12128,10 @@ Elm.PersonalKanban.make = function (_elm) {
                            ,_1: $Effects.none};
          case "TaskColumnAction": var updateColumn = function (_p1) {
               var _p2 = _p1;
-              return {ctor: "_Tuple2"
+              return {ctor: "_Tuple3"
                      ,_0: _p2._0
-                     ,_1: A2($TaskColumn.update,_p0._0,_p2._1)};
+                     ,_1: _p2._1
+                     ,_2: A2($TaskColumn.update,_p0._0,_p2._2)};
            };
            var newColumns = function () {
               var _p3 = model.columns;
@@ -12150,13 +12151,15 @@ Elm.PersonalKanban.make = function (_elm) {
          case "AddNewTaskToBoard":
          var updateFirstColumn = F2(function (index,_p4) {
               var _p5 = _p4;
-              var _p7 = _p5._0;
-              var _p6 = _p5._1;
-              return _U.eq(index,0) ? {ctor: "_Tuple2"
-                                      ,_0: _p7
-                                      ,_1: A2($TaskColumn.update,
+              var _p8 = _p5._0;
+              var _p7 = _p5._1;
+              var _p6 = _p5._2;
+              return _U.eq(index,0) ? {ctor: "_Tuple3"
+                                      ,_0: _p8
+                                      ,_1: _p7
+                                      ,_2: A2($TaskColumn.update,
                                       $TaskColumn.AddTask(_p0._0),
-                                      _p6)} : {ctor: "_Tuple2",_0: _p7,_1: _p6};
+                                      _p6)} : {ctor: "_Tuple3",_0: _p8,_1: _p7,_2: _p6};
            });
            var newColumns = A2($List.indexedMap,
            updateFirstColumn,
@@ -12173,17 +12176,20 @@ Elm.PersonalKanban.make = function (_elm) {
    });
    var initColumns = function () {
       var fakeTask = $TaskBox.withDescription("Fake task");
-      var todoColumn = {ctor: "_Tuple2"
-                       ,_0: {name: "To do"}
-                       ,_1: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+      var todoColumn = {ctor: "_Tuple3"
+                       ,_0: 1
+                       ,_1: {name: "To do"}
+                       ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                             ,nextTaskID: 2}};
-      var inProgressColumn = {ctor: "_Tuple2"
-                             ,_0: {name: "In progress"}
-                             ,_1: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+      var inProgressColumn = {ctor: "_Tuple3"
+                             ,_0: 2
+                             ,_1: {name: "In progress"}
+                             ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                                   ,nextTaskID: 2}};
-      var doneColumn = {ctor: "_Tuple2"
-                       ,_0: {name: "Done"}
-                       ,_1: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+      var doneColumn = {ctor: "_Tuple3"
+                       ,_0: 3
+                       ,_1: {name: "Done"}
+                       ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                             ,nextTaskID: 2}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);
    }();
@@ -12223,7 +12229,12 @@ Elm.PersonalKanban.make = function (_elm) {
       _U.list([]),
       A2($List.map,
       viewColumnCell,
-      A2($List.map,$Basics.snd,model.columns)));
+      A2($List.map,
+      function (_p9) {
+         var _p10 = _p9;
+         return _p10._2;
+      },
+      model.columns)));
       var headerContext = {addTaskAddress: A2($Signal.forwardTo,
       address,
       $Basics.always(AddNewTaskToBoardRequest))};
@@ -12236,7 +12247,12 @@ Elm.PersonalKanban.make = function (_elm) {
       _U.list([headerStyle]),
       A2($List.map,
       viewHeader,
-      A2($List.map,$Basics.fst,model.columns)));
+      A2($List.map,
+      function (_p11) {
+         var _p12 = _p11;
+         return _p12._1;
+      },
+      model.columns)));
       return A2($Html.span,
       _U.list([]),
       _U.list([A2($Html.table,

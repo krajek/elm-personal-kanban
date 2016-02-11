@@ -13,7 +13,7 @@ import AddTaskPopup
 
 type Action
     = NoOp
-    | TaskColumnAction TaskColumn.Action
+    | TaskColumnAction Int TaskColumn.Action
     | AddNewTaskToBoardRequest
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
@@ -63,22 +63,18 @@ update action model =
     NoOp ->
       (model, Effects.none)
 
-    TaskColumnAction columnAction ->
+    TaskColumnAction columnId columnAction ->
       let
         updateColumn (id, h, c) =
-          (id, h, TaskColumn.update columnAction c)
-        newColumns =
-          case model.columns of
-            [] -> model.columns
-            c :: rest -> (updateColumn c) :: rest
+          if id == columnId
+            then (id, h, TaskColumn.update columnAction c)
+            else (id, h, c)
+        newColumns = List.map updateColumn model.columns
         newModel =
           { model
           | columns = newColumns }
       in
         (newModel, Effects.none)
-
-
-
 
     AddNewTaskToBoardRequest ->
       let
@@ -145,11 +141,11 @@ view address model =
     headerContext = { addTaskAddress = Signal.forwardTo address (always AddNewTaskToBoardRequest)}
     viewHeader headerModel =
       th [headerCellStyle] [TaskHeader.view headerContext headerModel]
-    viewColumnCell column =
+    viewColumnCell (id, _, column) =
         td [cellStyle]
-          [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction)) column ]
+          [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction id)) column ]
     headersRow = tr [headerStyle] <| List.map viewHeader (List.map (\ (_, h, _) -> h) model.columns)
-    cellsRow = tr [] <| List.map viewColumnCell (List.map (\ (_, _, c) -> c) model.columns)
+    cellsRow = tr [] <| List.map viewColumnCell model.columns
     popupContext = { addTaskAddress = Signal.forwardTo address AddNewTaskToBoard }
     popup = AddTaskPopup.view  popupContext (Signal.forwardTo address PopupAction) model.popup
   in

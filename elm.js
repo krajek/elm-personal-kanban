@@ -12128,19 +12128,18 @@ Elm.PersonalKanban.make = function (_elm) {
                            ,_1: $Effects.none};
          case "TaskColumnAction": var updateColumn = function (_p1) {
               var _p2 = _p1;
-              return {ctor: "_Tuple3"
-                     ,_0: _p2._0
-                     ,_1: _p2._1
-                     ,_2: A2($TaskColumn.update,_p0._0,_p2._2)};
+              var _p5 = _p2._0;
+              var _p4 = _p2._1;
+              var _p3 = _p2._2;
+              return _U.eq(_p5,_p0._0) ? {ctor: "_Tuple3"
+                                         ,_0: _p5
+                                         ,_1: _p4
+                                         ,_2: A2($TaskColumn.update,_p0._1,_p3)} : {ctor: "_Tuple3"
+                                                                                   ,_0: _p5
+                                                                                   ,_1: _p4
+                                                                                   ,_2: _p3};
            };
-           var newColumns = function () {
-              var _p3 = model.columns;
-              if (_p3.ctor === "[]") {
-                    return model.columns;
-                 } else {
-                    return A2($List._op["::"],updateColumn(_p3._0),_p3._1);
-                 }
-           }();
+           var newColumns = A2($List.map,updateColumn,model.columns);
            var newModel = _U.update(model,{columns: newColumns});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
          case "AddNewTaskToBoardRequest": var newModel = _U.update(model,
@@ -12149,17 +12148,17 @@ Elm.PersonalKanban.make = function (_elm) {
            model.popup)});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
          case "AddNewTaskToBoard":
-         var updateFirstColumn = F2(function (index,_p4) {
-              var _p5 = _p4;
-              var _p8 = _p5._0;
-              var _p7 = _p5._1;
-              var _p6 = _p5._2;
+         var updateFirstColumn = F2(function (index,_p6) {
+              var _p7 = _p6;
+              var _p10 = _p7._0;
+              var _p9 = _p7._1;
+              var _p8 = _p7._2;
               return _U.eq(index,0) ? {ctor: "_Tuple3"
-                                      ,_0: _p8
-                                      ,_1: _p7
+                                      ,_0: _p10
+                                      ,_1: _p9
                                       ,_2: A2($TaskColumn.update,
                                       $TaskColumn.AddTask(_p0._0),
-                                      _p6)} : {ctor: "_Tuple3",_0: _p8,_1: _p7,_2: _p6};
+                                      _p8)} : {ctor: "_Tuple3",_0: _p10,_1: _p9,_2: _p8};
            });
            var newColumns = A2($List.indexedMap,
            updateFirstColumn,
@@ -12207,9 +12206,9 @@ Elm.PersonalKanban.make = function (_elm) {
       return {ctor: "PopupAction",_0: a};
    };
    var AddNewTaskToBoardRequest = {ctor: "AddNewTaskToBoardRequest"};
-   var TaskColumnAction = function (a) {
-      return {ctor: "TaskColumnAction",_0: a};
-   };
+   var TaskColumnAction = F2(function (a,b) {
+      return {ctor: "TaskColumnAction",_0: a,_1: b};
+   });
    var view = F2(function (address,model) {
       var popupContext = {addTaskAddress: A2($Signal.forwardTo,
       address,
@@ -12218,23 +12217,17 @@ Elm.PersonalKanban.make = function (_elm) {
       popupContext,
       A2($Signal.forwardTo,address,PopupAction),
       model.popup);
-      var viewColumnCell = function (column) {
+      var viewColumnCell = function (_p11) {
+         var _p12 = _p11;
          return A2($Html.td,
          _U.list([cellStyle]),
          _U.list([A2($TaskColumn.view,
-         A2($Signal.forwardTo,address,TaskColumnAction),
-         column)]));
+         A2($Signal.forwardTo,address,TaskColumnAction(_p12._0)),
+         _p12._2)]));
       };
       var cellsRow = A2($Html.tr,
       _U.list([]),
-      A2($List.map,
-      viewColumnCell,
-      A2($List.map,
-      function (_p9) {
-         var _p10 = _p9;
-         return _p10._2;
-      },
-      model.columns)));
+      A2($List.map,viewColumnCell,model.columns));
       var headerContext = {addTaskAddress: A2($Signal.forwardTo,
       address,
       $Basics.always(AddNewTaskToBoardRequest))};
@@ -12248,9 +12241,9 @@ Elm.PersonalKanban.make = function (_elm) {
       A2($List.map,
       viewHeader,
       A2($List.map,
-      function (_p11) {
-         var _p12 = _p11;
-         return _p12._1;
+      function (_p13) {
+         var _p14 = _p13;
+         return _p14._1;
       },
       model.columns)));
       return A2($Html.span,

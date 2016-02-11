@@ -32,11 +32,10 @@ update action model =
 
 -- VIEW
 
-windowStyle :  Bool -> Attribute
-windowStyle visible =
+windowStyle =
   style
     [ ("position", "absolute")
-    , ("display", if visible then "block" else "none")
+    , ("display", "block")
     , ("top",  "25%")
     , ("left",  "25%")
     , ("width",  "50%")
@@ -47,9 +46,9 @@ windowStyle visible =
     , ("z-index", "1002")
     , ("overflow",  "auto")]
 
-overlayStyle visible =
+overlayStyle =
   style
-  [ ("display", if visible then "block" else "none"),
+  [ ("display", "block"),
     ("position", "absolute"),
     ("left", "0%"),
     ("top", "0%"),
@@ -81,7 +80,7 @@ view context address model =
     if model.visible
     then
       div []
-        [ div [windowStyle model.visible] [popupContent]
-        , div [overlayStyle model.visible] [] ]
+        [ div [windowStyle] [popupContent]
+        , div [overlayStyle] [] ]
     else
       node "noscript" [] []

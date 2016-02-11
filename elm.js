@@ -11828,7 +11828,8 @@ Elm.AddTaskPopup.make = function (_elm) {
    $List = Elm.List.make(_elm),
    $Maybe = Elm.Maybe.make(_elm),
    $Result = Elm.Result.make(_elm),
-   $Signal = Elm.Signal.make(_elm);
+   $Signal = Elm.Signal.make(_elm),
+   $String = Elm.String.make(_elm);
    var _op = {};
    var Context = function (a) {    return {addTaskAddress: a};};
    var overlayStyle = $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
@@ -11863,14 +11864,15 @@ Elm.AddTaskPopup.make = function (_elm) {
    var Hide = {ctor: "Hide"};
    var view = F3(function (context,address,model) {
       var addButton = A2($Html.button,
-      _U.list([A2($Html$Events.onClick,
-      context.addTaskAddress,
-      model.taskDescription)]),
+      _U.list([$Html$Attributes.disabled($String.isEmpty(model.taskDescription))
+              ,A2($Html$Events.onClick,
+              context.addTaskAddress,
+              model.taskDescription)]),
       _U.list([$Html.text("Add")]));
       var cancelButton = A2($Html.button,
       _U.list([A2($Html$Events.onClick,address,Hide)]),
       _U.list([$Html.text("Cancel")]));
-      var taskInput = A2($Html.input,
+      var taskInput = A2($Html.textarea,
       _U.list([$Html$Attributes.placeholder("Enter task description")
               ,$Html$Attributes.value(model.taskDescription)
               ,A3($Html$Events.on,
@@ -11878,7 +11880,10 @@ Elm.AddTaskPopup.make = function (_elm) {
               $Html$Events.targetValue,
               function (_p0) {
                  return A2($Signal.message,address,TaskDescription(_p0));
-              })]),
+              })
+              ,$Html$Attributes.style(_U.list([{ctor: "_Tuple2"
+                                               ,_0: "display"
+                                               ,_1: "block"}]))]),
       _U.list([]));
       var popupContent = A2($Html.div,
       _U.list([]),

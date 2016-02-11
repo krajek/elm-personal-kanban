@@ -3,6 +3,7 @@ module AddTaskPopup(Model, init, Action(Show, Hide), update, view) where
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, targetValue, on)
+import String
 
 -- MODEL
 
@@ -67,14 +68,15 @@ type alias Context =
 view : Context -> Signal.Address Action -> Model -> Html
 view context address model =
   let
-    taskInput = input
+    taskInput = textarea
         [ placeholder "Enter task description"
         , value model.taskDescription
         , on "input" targetValue (Signal.message address << TaskDescription)
+        , style [("display", "block")]
         ]
         []
     cancelButton = button [onClick address Hide] [text "Cancel"]
-    addButton = button [onClick context.addTaskAddress model.taskDescription] [text "Add"]
+    addButton = button [disabled <| String.isEmpty model.taskDescription, onClick context.addTaskAddress model.taskDescription] [text "Add"]
     popupContent = div [] [taskInput, addButton, cancelButton]
   in
     if model.visible

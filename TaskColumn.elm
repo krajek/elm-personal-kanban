@@ -7,6 +7,7 @@ import TaskBox
 type Action
   = AddTask String
   | TaskBoxAction Int TaskBox.Action
+  | RemoveTask Int
 
 type alias Model =
   { tasks : List (Int, TaskBox.Model)
@@ -37,6 +38,10 @@ update action model =
       in
         newModel
 
+    RemoveTask taskId ->
+      model
+
+
 
 view : Signal.Address Action -> Model -> Html
 view address model =
@@ -44,8 +49,9 @@ view address model =
     viewTask (taskId, task) =
       let
         taskBoxAddress = Signal.forwardTo address <| TaskBoxAction taskId
+        context = { deleteAddress = Signal.forwardTo address (always <| RemoveTask taskId) }
       in
-        TaskBox.view taskBoxAddress task
+        TaskBox.view context taskBoxAddress task
     tasks = List.map viewTask model.tasks
   in
     section [] tasks

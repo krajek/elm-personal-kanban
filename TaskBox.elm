@@ -1,8 +1,8 @@
 module TaskBox(Model, withDescription, Action, update, view) where
 
-import Html exposing (p, Html, text)
+import Html exposing (p, Html, text, button)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onMouseEnter, onMouseLeave)
+import Html.Events exposing (onMouseEnter, onMouseLeave, onClick)
 
 -- MODEL
 
@@ -35,11 +35,19 @@ taskStyle mouseOver =
   , ("margin", "20px 10px")
   , ("cursor", "pointer")]
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+type alias Context =
+  { deleteAddress : Signal.Address () }
+
+view : Context -> Signal.Address Action -> Model -> Html
+view context address model =
   let
     enter = onMouseEnter address OnMouseEnter
     leave = onMouseLeave address OnMouseLeave
     attributes = [taskStyle model.mouseOver, enter, leave]
+    deleteButtonPart =
+      if model.mouseOver
+        then [ button [onClick context.deleteAddress ()] [text "X"] ]
+        else []
+    descriptionPart = [text model.description]
   in
-    p attributes [text model.description]
+    p attributes <| descriptionPart ++ deleteButtonPart

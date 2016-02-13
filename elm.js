@@ -11939,6 +11939,7 @@ Elm.TaskBox.make = function (_elm) {
    $Result = Elm.Result.make(_elm),
    $Signal = Elm.Signal.make(_elm);
    var _op = {};
+   var Context = function (a) {    return {deleteAddress: a};};
    var taskStyle = function (mouseOver) {
       return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                              ,_0: "border"
@@ -11956,17 +11957,21 @@ Elm.TaskBox.make = function (_elm) {
    });
    var OnMouseLeave = {ctor: "OnMouseLeave"};
    var OnMouseEnter = {ctor: "OnMouseEnter"};
-   var view = F2(function (address,model) {
-      var leave = A2($Html$Events.onMouseLeave,
-      address,
-      OnMouseLeave);
+   var view = F3(function (context,address,model) {
+      var descriptionPart = _U.list([$Html.text(model.description)]);
+      var deleteButtonPart = model.mouseOver ? _U.list([A2($Html.button,
+      _U.list([A2($Html$Events.onClick,
+      context.deleteAddress,
+      {ctor: "_Tuple0"})]),
+      _U.list([$Html.text("X")]))]) : _U.list([]);
+      var leave = A2($Html$Events.onMouseLeave,address,OnMouseLeave);
       var enter = A2($Html$Events.onMouseEnter,address,OnMouseEnter);
       var attributes = _U.list([taskStyle(model.mouseOver)
                                ,enter
                                ,leave]);
       return A2($Html.p,
       attributes,
-      _U.list([$Html.text(model.description)]));
+      A2($Basics._op["++"],descriptionPart,deleteButtonPart));
    });
    var withDescription = function (description) {
       return {description: description,mouseOver: false};
@@ -11997,43 +12002,49 @@ Elm.TaskColumn.make = function (_elm) {
    var _op = {};
    var update = F2(function (action,model) {
       var _p0 = action;
-      if (_p0.ctor === "AddTask") {
-            var newTask = {ctor: "_Tuple2"
-                          ,_0: model.nextTaskID
-                          ,_1: $TaskBox.withDescription(_p0._0)};
-            var newModel = _U.update(model,
-            {tasks: A2($Basics._op["++"],model.tasks,_U.list([newTask]))
-            ,nextTaskID: model.nextTaskID + 1});
-            return newModel;
-         } else {
-            var updateTask = function (_p1) {
-               var _p2 = _p1;
-               var _p4 = _p2._1;
-               var _p3 = _p2._0;
-               return _U.eq(_p0._0,_p3) ? {ctor: "_Tuple2"
-                                          ,_0: _p3
-                                          ,_1: A2($TaskBox.update,_p0._1,_p4)} : {ctor: "_Tuple2"
-                                                                                 ,_0: _p3
-                                                                                 ,_1: _p4};
-            };
-            var newModel = _U.update(model,
-            {tasks: A2($List.map,updateTask,model.tasks)});
-            return newModel;
-         }
+      switch (_p0.ctor)
+      {case "AddTask": var newTask = {ctor: "_Tuple2"
+                                     ,_0: model.nextTaskID
+                                     ,_1: $TaskBox.withDescription(_p0._0)};
+           var newModel = _U.update(model,
+           {tasks: A2($Basics._op["++"],model.tasks,_U.list([newTask]))
+           ,nextTaskID: model.nextTaskID + 1});
+           return newModel;
+         case "TaskBoxAction": var updateTask = function (_p1) {
+              var _p2 = _p1;
+              var _p4 = _p2._1;
+              var _p3 = _p2._0;
+              return _U.eq(_p0._0,_p3) ? {ctor: "_Tuple2"
+                                         ,_0: _p3
+                                         ,_1: A2($TaskBox.update,_p0._1,_p4)} : {ctor: "_Tuple2"
+                                                                                ,_0: _p3
+                                                                                ,_1: _p4};
+           };
+           var newModel = _U.update(model,
+           {tasks: A2($List.map,updateTask,model.tasks)});
+           return newModel;
+         default: return model;}
    });
    var Model = F2(function (a,b) {
       return {tasks: a,nextTaskID: b};
    });
+   var RemoveTask = function (a) {
+      return {ctor: "RemoveTask",_0: a};
+   };
    var TaskBoxAction = F2(function (a,b) {
       return {ctor: "TaskBoxAction",_0: a,_1: b};
    });
    var view = F2(function (address,model) {
       var viewTask = function (_p5) {
          var _p6 = _p5;
+         var _p7 = _p6._0;
+         var context = {deleteAddress: A2($Signal.forwardTo,
+         address,
+         $Basics.always(RemoveTask(_p7)))};
          var taskBoxAddress = A2($Signal.forwardTo,
          address,
-         TaskBoxAction(_p6._0));
-         return A2($TaskBox.view,taskBoxAddress,_p6._1);
+         TaskBoxAction(_p7));
+         return A3($TaskBox.view,context,taskBoxAddress,_p6._1);
       };
       var tasks = A2($List.map,viewTask,model.tasks);
       return A2($Html.section,_U.list([]),tasks);
@@ -12044,6 +12055,7 @@ Elm.TaskColumn.make = function (_elm) {
    return _elm.TaskColumn.values = {_op: _op
                                    ,AddTask: AddTask
                                    ,TaskBoxAction: TaskBoxAction
+                                   ,RemoveTask: RemoveTask
                                    ,Model: Model
                                    ,update: update
                                    ,view: view};

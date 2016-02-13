@@ -11957,15 +11957,27 @@ Elm.TaskBox.make = function (_elm) {
    });
    var OnMouseLeave = {ctor: "OnMouseLeave"};
    var OnMouseEnter = {ctor: "OnMouseEnter"};
+   var withDescription = F2(function (description,
+   movePossibility) {
+      return {description: description
+             ,mouseOver: false
+             ,movePossibility: movePossibility};
+   });
+   var OnlyRight = {ctor: "OnlyRight"};
+   var BothWays = {ctor: "BothWays"};
+   var OnlyLeft = {ctor: "OnlyLeft"};
    var view = F3(function (context,address,model) {
-      var movePartText = function () {
-         var _p1 = model.movePossibility;
-         switch (_p1.ctor)
-         {case "OnlyLeft": return "left";
-            case "BothWays": return "both";
-            default: return "right";}
-      }();
-      var movePart = _U.list([$Html.text(movePartText)]);
+      var moveRightPart = model.mouseOver && (_U.eq(model.movePossibility,
+      OnlyRight) || _U.eq(model.movePossibility,
+      BothWays)) ? _U.list([A2($Html.button,
+      _U.list([]),
+      _U.list([$Html.text("=>")]))]) : _U.list([]);
+      var moveLeftPart = model.mouseOver && (_U.eq(model.movePossibility,
+      OnlyLeft) || _U.eq(model.movePossibility,
+      BothWays)) ? _U.list([A2($Html.button,
+      _U.list([]),
+      _U.list([$Html.text("<=")]))]) : _U.list([]);
+      var movePart = A2($Basics._op["++"],moveLeftPart,moveRightPart);
       var descriptionPart = _U.list([$Html.text(model.description)]);
       var deleteButtonPart = model.mouseOver ? _U.list([A2($Html.button,
       _U.list([A2($Html$Events.onClick,
@@ -11983,15 +11995,6 @@ Elm.TaskBox.make = function (_elm) {
       descriptionPart,
       A2($Basics._op["++"],deleteButtonPart,movePart)));
    });
-   var withDescription = F2(function (description,
-   movePossibility) {
-      return {description: description
-             ,mouseOver: false
-             ,movePossibility: movePossibility};
-   });
-   var OnlyRight = {ctor: "OnlyRight"};
-   var BothWays = {ctor: "BothWays"};
-   var OnlyLeft = {ctor: "OnlyLeft"};
    var Model = F3(function (a,b,c) {
       return {description: a,mouseOver: b,movePossibility: c};
    });

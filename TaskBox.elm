@@ -57,11 +57,14 @@ view context address model =
         then [ button [onClick context.deleteAddress ()] [text "X"] ]
         else []
     descriptionPart = [text model.description]
-    movePartText =
-      case model.movePossibility of
-        OnlyLeft -> "left"
-        BothWays -> "both"
-        OnlyRight -> "right"
-    movePart = [text movePartText]
+    moveLeftPart =
+      if model.mouseOver && (model.movePossibility == OnlyLeft || model.movePossibility == BothWays)
+        then [button [] [text "<="]]
+        else []
+    moveRightPart =
+      if model.mouseOver && (model.movePossibility == OnlyRight || model.movePossibility == BothWays)
+        then [button [] [text "=>"]]
+        else []
+    movePart = moveLeftPart ++ moveRightPart
   in
     p attributes <| descriptionPart ++ deleteButtonPart ++ movePart

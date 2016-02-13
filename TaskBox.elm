@@ -44,7 +44,9 @@ taskStyle mouseOver =
   , ("cursor", "pointer")]
 
 type alias Context =
-  { deleteAddress : Signal.Address () }
+  { deleteAddress : Signal.Address ()
+  , moveLeftAddress : Signal.Address ()
+  , moveRightAddress : Signal.Address () }
 
 view : Context -> Signal.Address Action -> Model -> Html
 view context address model =
@@ -59,11 +61,11 @@ view context address model =
     descriptionPart = [text model.description]
     moveLeftPart =
       if model.mouseOver && (model.movePossibility == OnlyLeft || model.movePossibility == BothWays)
-        then [button [] [text "<="]]
+        then [button [onClick context.moveLeftAddress ()] [text "<="]]
         else []
     moveRightPart =
       if model.mouseOver && (model.movePossibility == OnlyRight || model.movePossibility == BothWays)
-        then [button [] [text "=>"]]
+        then [button [onClick context.moveRightAddress ()] [text "=>"]]
         else []
     movePart = moveLeftPart ++ moveRightPart
   in

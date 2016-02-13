@@ -1,4 +1,4 @@
-module TaskColumn(Action(AddTask), Position(First, Surrounded, Last), Model, update, view) where
+module TaskColumn(Action(AddTask), Position(First, Surrounded, Last), Model, update, Context, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -53,16 +53,23 @@ update action model =
       | tasks = List.filter (\(id, task) -> taskId /= id) model.tasks }
 
 
+type alias Context =
+  { moveRightAddress : Signal.Address Int
+  , moveLeftAddress : Signal.Address Int }
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+
+view : Context -> Signal.Address Action -> Model -> Html
+view context address model =
   let
     viewTask (taskId, task) =
       let
         taskBoxAddress = Signal.forwardTo address <| TaskBoxAction taskId
-        context = { deleteAddress = Signal.forwardTo address (always <| RemoveTask taskId) }
+        taskContext =
+          { deleteAddress = Signal.forwardTo address (always <| RemoveTask taskId)
+          , moveLeftAddress = Signal.forwardTo context.moveLeftAddress (always taskId)
+          , moveRightAddress = Signal.forwardTo context.moveRightAddress (always taskId) }
       in
-        TaskBox.view context taskBoxAddress task
+        TaskBox.view taskContext taskBoxAddress task
     tasks = List.map viewTask model.tasks
   in
     section [] tasks

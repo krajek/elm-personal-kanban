@@ -17,6 +17,8 @@ type Action
     | AddNewTaskToBoardRequest
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
+    | MoveTaskLeft Int Int
+    | MoveTaskRight Int Int
 
 -- MODEL
 
@@ -111,6 +113,11 @@ update action model =
       in
         (newModel, Effects.none)
 
+    MoveTaskLeft columnId taskId->
+      (model, Effects.none)
+    MoveTaskRight columnId taskId ->
+      (model, Effects.none)
+
 -- VIEW
 
 tableStyle : Attribute
@@ -143,9 +150,17 @@ view address model =
     headerContext = { addTaskAddress = Signal.forwardTo address (always AddNewTaskToBoardRequest)}
     viewHeader headerModel =
       th [headerCellStyle] [TaskHeader.view headerContext headerModel]
+
+
     viewColumnCell (id, _, column) =
-        td [cellStyle]
-          [ TaskColumn.view (Signal.forwardTo address (TaskColumnAction id)) column ]
+        let
+          taskColumnContext : TaskColumn.Context
+          taskColumnContext =
+            { moveRightAddress = Signal.forwardTo address <| MoveTaskRight id
+            , moveLeftAddress = Signal.forwardTo address <| MoveTaskLeft id }
+        in
+          td [cellStyle]
+            [ TaskColumn.view taskColumnContext (Signal.forwardTo address (TaskColumnAction id)) column ]
     headersRow = tr [headerStyle] <| List.map viewHeader (List.map (\ (_, h, _) -> h) model.columns)
     cellsRow = tr [] <| List.map viewColumnCell model.columns
     popupContext = { addTaskAddress = Signal.forwardTo address AddNewTaskToBoard }

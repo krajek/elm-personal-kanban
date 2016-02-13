@@ -1,4 +1,4 @@
-module TaskColumn where
+module TaskColumn(Action(AddTask), Position(First, Surrounded, Last), Model, update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -10,11 +10,15 @@ type Action
   | TaskBoxAction Int TaskBox.Action
   | RemoveTask Int
 
+type Position
+  = First
+  | Surrounded
+  | Last
+
 type alias Model =
   { tasks : List (Int, TaskBox.Model)
   , nextTaskID : Int
-  , isFirst : Bool
-  , isLast : Bool }
+  , position : Position }
 
 update : Action -> Model -> Model
 update action model =

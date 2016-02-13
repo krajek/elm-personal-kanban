@@ -12031,9 +12031,12 @@ Elm.TaskColumn.make = function (_elm) {
            },
            model.tasks)});}
    });
-   var Model = F4(function (a,b,c,d) {
-      return {tasks: a,nextTaskID: b,isFirst: c,isLast: d};
+   var Model = F3(function (a,b,c) {
+      return {tasks: a,nextTaskID: b,position: c};
    });
+   var Last = {ctor: "Last"};
+   var Surrounded = {ctor: "Surrounded"};
+   var First = {ctor: "First"};
    var RemoveTask = function (a) {
       return {ctor: "RemoveTask",_0: a};
    };
@@ -12059,12 +12062,13 @@ Elm.TaskColumn.make = function (_elm) {
       return {ctor: "AddTask",_0: a};
    };
    return _elm.TaskColumn.values = {_op: _op
-                                   ,AddTask: AddTask
-                                   ,TaskBoxAction: TaskBoxAction
-                                   ,RemoveTask: RemoveTask
-                                   ,Model: Model
                                    ,update: update
-                                   ,view: view};
+                                   ,view: view
+                                   ,Model: Model
+                                   ,AddTask: AddTask
+                                   ,First: First
+                                   ,Surrounded: Surrounded
+                                   ,Last: Last};
 };
 Elm.TaskHeader = Elm.TaskHeader || {};
 Elm.TaskHeader.make = function (_elm) {
@@ -12208,22 +12212,19 @@ Elm.PersonalKanban.make = function (_elm) {
                        ,_1: {name: "To do",addActionAvailable: true}
                        ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                             ,nextTaskID: 2
-                            ,isFirst: true
-                            ,isLast: false}};
+                            ,position: $TaskColumn.First}};
       var inProgressColumn = {ctor: "_Tuple3"
                              ,_0: 2
                              ,_1: {name: "In progress",addActionAvailable: false}
                              ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                                   ,nextTaskID: 2
-                                  ,isFirst: false
-                                  ,isLast: false}};
+                                  ,position: $TaskColumn.Surrounded}};
       var doneColumn = {ctor: "_Tuple3"
                        ,_0: 3
                        ,_1: {name: "Done",addActionAvailable: false}
                        ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
                             ,nextTaskID: 2
-                            ,isFirst: false
-                            ,isLast: true}};
+                            ,position: $TaskColumn.Last}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);
    }();
    var init = function () {

@@ -3,6 +3,7 @@ module TaskColumn where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import TaskBox
+import Debug
 
 type Action
   = AddTask String
@@ -39,7 +40,8 @@ update action model =
         newModel
 
     RemoveTask taskId ->
-      model
+      { model
+      | tasks = List.filter (\(id, task) -> taskId /= id) model.tasks }
 
 
 

@@ -12023,7 +12023,13 @@ Elm.TaskColumn.make = function (_elm) {
            var newModel = _U.update(model,
            {tasks: A2($List.map,updateTask,model.tasks)});
            return newModel;
-         default: return model;}
+         default: return _U.update(model,
+           {tasks: A2($List.filter,
+           function (_p5) {
+              var _p6 = _p5;
+              return !_U.eq(_p0._0,_p6._0);
+           },
+           model.tasks)});}
    });
    var Model = F2(function (a,b) {
       return {tasks: a,nextTaskID: b};
@@ -12035,16 +12041,16 @@ Elm.TaskColumn.make = function (_elm) {
       return {ctor: "TaskBoxAction",_0: a,_1: b};
    });
    var view = F2(function (address,model) {
-      var viewTask = function (_p5) {
-         var _p6 = _p5;
-         var _p7 = _p6._0;
+      var viewTask = function (_p7) {
+         var _p8 = _p7;
+         var _p9 = _p8._0;
          var context = {deleteAddress: A2($Signal.forwardTo,
          address,
-         $Basics.always(RemoveTask(_p7)))};
+         $Basics.always(RemoveTask(_p9)))};
          var taskBoxAddress = A2($Signal.forwardTo,
          address,
-         TaskBoxAction(_p7));
-         return A3($TaskBox.view,context,taskBoxAddress,_p6._1);
+         TaskBoxAction(_p9));
+         return A3($TaskBox.view,context,taskBoxAddress,_p8._1);
       };
       var tasks = A2($List.map,viewTask,model.tasks);
       return A2($Html.section,_U.list([]),tasks);

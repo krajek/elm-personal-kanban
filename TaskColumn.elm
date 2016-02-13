@@ -12,7 +12,9 @@ type Action
 
 type alias Model =
   { tasks : List (Int, TaskBox.Model)
-  , nextTaskID : Int }
+  , nextTaskID : Int
+  , isFirst : Bool
+  , isLast : Bool }
 
 update : Action -> Model -> Model
 update action model =

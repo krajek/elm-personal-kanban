@@ -32,15 +32,15 @@ initColumns =
     todoColumn =
       ( 1
       , { name = "To do", addActionAvailable = True }
-      , { tasks = [(1, fakeTask)], nextTaskID = 2 })
+      , { tasks = [(1, fakeTask)], nextTaskID = 2, isFirst = True, isLast = False })
     inProgressColumn =
       ( 2
       , { name = "In progress", addActionAvailable = False }
-      , { tasks = [(1, fakeTask)], nextTaskID = 2 })
+      , { tasks = [(1, fakeTask)], nextTaskID = 2, isFirst = False, isLast = False })
     doneColumn =
       ( 3
       , { name = "Done", addActionAvailable = False }
-      , { tasks = [(1, fakeTask)], nextTaskID = 2  })
+      , { tasks = [(1, fakeTask)], nextTaskID = 2, isFirst = False, isLast = True })
   in
     [todoColumn, inProgressColumn, doneColumn]
 

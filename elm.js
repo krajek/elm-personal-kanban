@@ -12031,8 +12031,8 @@ Elm.TaskColumn.make = function (_elm) {
            },
            model.tasks)});}
    });
-   var Model = F2(function (a,b) {
-      return {tasks: a,nextTaskID: b};
+   var Model = F4(function (a,b,c,d) {
+      return {tasks: a,nextTaskID: b,isFirst: c,isLast: d};
    });
    var RemoveTask = function (a) {
       return {ctor: "RemoveTask",_0: a};
@@ -12207,17 +12207,23 @@ Elm.PersonalKanban.make = function (_elm) {
                        ,_0: 1
                        ,_1: {name: "To do",addActionAvailable: true}
                        ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
-                            ,nextTaskID: 2}};
+                            ,nextTaskID: 2
+                            ,isFirst: true
+                            ,isLast: false}};
       var inProgressColumn = {ctor: "_Tuple3"
                              ,_0: 2
                              ,_1: {name: "In progress",addActionAvailable: false}
                              ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
-                                  ,nextTaskID: 2}};
+                                  ,nextTaskID: 2
+                                  ,isFirst: false
+                                  ,isLast: false}};
       var doneColumn = {ctor: "_Tuple3"
                        ,_0: 3
                        ,_1: {name: "Done",addActionAvailable: false}
                        ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
-                            ,nextTaskID: 2}};
+                            ,nextTaskID: 2
+                            ,isFirst: false
+                            ,isLast: true}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);
    }();
    var init = function () {

@@ -11958,6 +11958,14 @@ Elm.TaskBox.make = function (_elm) {
    var OnMouseLeave = {ctor: "OnMouseLeave"};
    var OnMouseEnter = {ctor: "OnMouseEnter"};
    var view = F3(function (context,address,model) {
+      var movePartText = function () {
+         var _p1 = model.movePossibility;
+         switch (_p1.ctor)
+         {case "OnlyLeft": return "left";
+            case "BothWays": return "both";
+            default: return "right";}
+      }();
+      var movePart = _U.list([$Html.text(movePartText)]);
       var descriptionPart = _U.list([$Html.text(model.description)]);
       var deleteButtonPart = model.mouseOver ? _U.list([A2($Html.button,
       _U.list([A2($Html$Events.onClick,
@@ -11971,19 +11979,30 @@ Elm.TaskBox.make = function (_elm) {
                                ,leave]);
       return A2($Html.p,
       attributes,
-      A2($Basics._op["++"],descriptionPart,deleteButtonPart));
+      A2($Basics._op["++"],
+      descriptionPart,
+      A2($Basics._op["++"],deleteButtonPart,movePart)));
    });
-   var withDescription = function (description) {
-      return {description: description,mouseOver: false};
-   };
-   var Model = F2(function (a,b) {
-      return {description: a,mouseOver: b};
+   var withDescription = F2(function (description,
+   movePossibility) {
+      return {description: description
+             ,mouseOver: false
+             ,movePossibility: movePossibility};
+   });
+   var OnlyRight = {ctor: "OnlyRight"};
+   var BothWays = {ctor: "BothWays"};
+   var OnlyLeft = {ctor: "OnlyLeft"};
+   var Model = F3(function (a,b,c) {
+      return {description: a,mouseOver: b,movePossibility: c};
    });
    return _elm.TaskBox.values = {_op: _op
                                 ,withDescription: withDescription
                                 ,update: update
                                 ,view: view
-                                ,Model: Model};
+                                ,Model: Model
+                                ,OnlyLeft: OnlyLeft
+                                ,BothWays: BothWays
+                                ,OnlyRight: OnlyRight};
 };
 Elm.TaskColumn = Elm.TaskColumn || {};
 Elm.TaskColumn.make = function (_elm) {
@@ -12005,7 +12024,7 @@ Elm.TaskColumn.make = function (_elm) {
       switch (_p0.ctor)
       {case "AddTask": var newTask = {ctor: "_Tuple2"
                                      ,_0: model.nextTaskID
-                                     ,_1: $TaskBox.withDescription(_p0._0)};
+                                     ,_1: A2($TaskBox.withDescription,_p0._0,$TaskBox.OnlyRight)};
            var newModel = _U.update(model,
            {tasks: A2($Basics._op["++"],model.tasks,_U.list([newTask]))
            ,nextTaskID: model.nextTaskID + 1});
@@ -12206,25 +12225,35 @@ Elm.PersonalKanban.make = function (_elm) {
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
    });
    var initColumns = function () {
-      var fakeTask = $TaskBox.withDescription("Fake task");
-      var todoColumn = {ctor: "_Tuple3"
-                       ,_0: 1
-                       ,_1: {name: "To do",addActionAvailable: true}
-                       ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
-                            ,nextTaskID: 2
-                            ,position: $TaskColumn.First}};
-      var inProgressColumn = {ctor: "_Tuple3"
-                             ,_0: 2
-                             ,_1: {name: "In progress",addActionAvailable: false}
-                             ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
-                                  ,nextTaskID: 2
-                                  ,position: $TaskColumn.Surrounded}};
+      var fakeTaskDone = A2($TaskBox.withDescription,
+      "Fake task",
+      $TaskBox.OnlyLeft);
       var doneColumn = {ctor: "_Tuple3"
                        ,_0: 3
                        ,_1: {name: "Done",addActionAvailable: false}
-                       ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTask}])
+                       ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTaskDone}])
                             ,nextTaskID: 2
                             ,position: $TaskColumn.Last}};
+      var fakeTaskInProgress = A2($TaskBox.withDescription,
+      "Fake task",
+      $TaskBox.BothWays);
+      var inProgressColumn = {ctor: "_Tuple3"
+                             ,_0: 2
+                             ,_1: {name: "In progress",addActionAvailable: false}
+                             ,_2: {tasks: _U.list([{ctor: "_Tuple2"
+                                                   ,_0: 1
+                                                   ,_1: fakeTaskInProgress}])
+                                  ,nextTaskID: 2
+                                  ,position: $TaskColumn.Surrounded}};
+      var fakeTaskTodo = A2($TaskBox.withDescription,
+      "Fake task",
+      $TaskBox.OnlyRight);
+      var todoColumn = {ctor: "_Tuple3"
+                       ,_0: 1
+                       ,_1: {name: "To do",addActionAvailable: true}
+                       ,_2: {tasks: _U.list([{ctor: "_Tuple2",_0: 1,_1: fakeTaskTodo}])
+                            ,nextTaskID: 2
+                            ,position: $TaskColumn.First}};
       return _U.list([todoColumn,inProgressColumn,doneColumn]);
    }();
    var init = function () {

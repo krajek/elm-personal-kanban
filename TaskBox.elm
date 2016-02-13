@@ -1,4 +1,4 @@
-module TaskBox(Model, withDescription, Action, update, view) where
+module TaskBox(Model, MovePossibility(..), withDescription, Action, update, view) where
 
 import Html exposing (p, Html, text, button)
 import Html.Attributes exposing (style)
@@ -8,11 +8,19 @@ import Html.Events exposing (onMouseEnter, onMouseLeave, onClick)
 
 type alias Model =
   { description : String
-  , mouseOver : Bool }
+  , mouseOver : Bool
+  , movePossibility : MovePossibility }
 
-withDescription description =
+type MovePossibility
+  = OnlyLeft
+  | BothWays
+  | OnlyRight
+
+withDescription : String -> MovePossibility -> Model
+withDescription description movePossibility =
   { description = description
-  , mouseOver = False }
+  , mouseOver = False
+  , movePossibility = movePossibility }
 
 -- UPDATE
 
@@ -49,5 +57,11 @@ view context address model =
         then [ button [onClick context.deleteAddress ()] [text "X"] ]
         else []
     descriptionPart = [text model.description]
+    movePartText =
+      case model.movePossibility of
+        OnlyLeft -> "left"
+        BothWays -> "both"
+        OnlyRight -> "right"
+    movePart = [text movePartText]
   in
-    p attributes <| descriptionPart ++ deleteButtonPart
+    p attributes <| descriptionPart ++ deleteButtonPart ++ movePart

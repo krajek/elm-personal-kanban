@@ -25,7 +25,7 @@ update action model =
   case action of
     AddTask content ->
       let
-        newTask = (model.nextTaskID, TaskBox.withDescription content)
+        newTask = (model.nextTaskID, TaskBox.withDescription content TaskBox.OnlyRight)
         newModel =
             { model
             | tasks = model.tasks ++ [newTask]
@@ -35,10 +35,13 @@ update action model =
 
     TaskBoxAction taskId taskBoxAction ->
       let
+        updateTask : (Int, TaskBox.Model) -> (Int, TaskBox.Model)
         updateTask (id, task) =
           if taskId == id
             then (id, TaskBox.update taskBoxAction task)
             else (id, task)
+
+        newModel : Model
         newModel =
           { model
           | tasks = List.map updateTask model.tasks }

@@ -113,26 +113,40 @@ update action model =
       in
         (newModel, Effects.none)
 
-    MoveTaskLeft columnId taskId->
-      (model, Effects.none)
-    MoveTaskRight columnId taskId ->
+    MoveTaskLeft columnId taskId ->
       let
-        addTaskToRightColumn (id, headerModel, columnModel) =
-          if id == columnId + 1 then
-            (id, headerModel, TaskColumn.update (TaskColumn.AddTask "MovedTask") columnModel)
-          else
-            (id, headerModel, columnModel)
-        removeFromColumn (id, headerModel, columnModel) =
-          if id == columnId then
-            (id, headerModel, TaskColumn.update (TaskColumn.RemoveTask taskId) columnModel)
-          else
-            (id, headerModel, columnModel)
+        targetColumnId = columnId - 1
+        newColumns = moveTask model.columns columnId targetColumnId taskId "MOVED TASK"
         newModel =
           { model
-          | columns = model.columns |> List.map (addTaskToRightColumn >> removeFromColumn)}
+          | columns = newColumns }
+      in
+        (newModel, Effects.none)
+    MoveTaskRight columnId taskId ->
+      let
+        targetColumnId = columnId + 1
+        newColumns = moveTask model.columns columnId targetColumnId taskId "MOVED TASK"
+        newModel =
+          { model
+          | columns = newColumns }
       in
         (newModel, Effects.none)
 
+moveTask : List (Int, TaskHeader.Model, TaskColumn.Model) -> Int -> Int -> Int -> String -> List (Int, TaskHeader.Model, TaskColumn.Model)
+moveTask columns columnId targetColumnId taskId taskDescription =
+  let
+    addTaskToRightColumn (id, headerModel, columnModel) =
+      if id == targetColumnId then
+        (id, headerModel, TaskColumn.update (TaskColumn.AddTask taskDescription) columnModel)
+      else
+        (id, headerModel, columnModel)
+    removeFromColumn (id, headerModel, columnModel) =
+      if id == columnId then
+        (id, headerModel, TaskColumn.update (TaskColumn.RemoveTask taskId) columnModel)
+      else
+        (id, headerModel, columnModel)
+  in
+    columns |> List.map (addTaskToRightColumn >> removeFromColumn)
 -- VIEW
 
 tableStyle : Attribute

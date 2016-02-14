@@ -1,4 +1,4 @@
-module TaskColumn(Action(AddTask), Position(First, Surrounded, Last), Model, update, Context, view) where
+module TaskColumn(Action(AddTask, RemoveTask), Position(First, Surrounded, Last), Model, update, Context, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -25,7 +25,12 @@ update action model =
   case action of
     AddTask content ->
       let
-        newTask = (model.nextTaskID, TaskBox.withDescription content TaskBox.OnlyRight)
+        taskMove =
+          case model.position of
+            First -> TaskBox.OnlyRight
+            Last -> TaskBox.OnlyLeft
+            Surrounded -> TaskBox.BothWays
+        newTask = (model.nextTaskID, TaskBox.withDescription content taskMove)
         newModel =
             { model
             | tasks = model.tasks ++ [newTask]

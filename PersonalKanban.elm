@@ -116,7 +116,22 @@ update action model =
     MoveTaskLeft columnId taskId->
       (model, Effects.none)
     MoveTaskRight columnId taskId ->
-      (model, Effects.none)
+      let
+        addTaskToRightColumn (id, headerModel, columnModel) =
+          if id == columnId + 1 then
+            (id, headerModel, TaskColumn.update (TaskColumn.AddTask "MovedTask") columnModel)
+          else
+            (id, headerModel, columnModel)
+        removeFromColumn (id, headerModel, columnModel) =
+          if id == columnId then
+            (id, headerModel, TaskColumn.update (TaskColumn.RemoveTask taskId) columnModel)
+          else
+            (id, headerModel, columnModel)
+        newModel =
+          { model
+          | columns = model.columns |> List.map (addTaskToRightColumn >> removeFromColumn)}
+      in
+        (newModel, Effects.none)
 
 -- VIEW
 

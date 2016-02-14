@@ -12036,31 +12036,38 @@ Elm.TaskColumn.make = function (_elm) {
    var update = F2(function (action,model) {
       var _p0 = action;
       switch (_p0.ctor)
-      {case "AddTask": var newTask = {ctor: "_Tuple2"
-                                     ,_0: model.nextTaskID
-                                     ,_1: A2($TaskBox.withDescription,_p0._0,$TaskBox.OnlyRight)};
+      {case "AddTask": var taskMove = function () {
+              var _p1 = model.position;
+              switch (_p1.ctor)
+              {case "First": return $TaskBox.OnlyRight;
+                 case "Last": return $TaskBox.OnlyLeft;
+                 default: return $TaskBox.BothWays;}
+           }();
+           var newTask = {ctor: "_Tuple2"
+                         ,_0: model.nextTaskID
+                         ,_1: A2($TaskBox.withDescription,_p0._0,taskMove)};
            var newModel = _U.update(model,
            {tasks: A2($Basics._op["++"],model.tasks,_U.list([newTask]))
            ,nextTaskID: model.nextTaskID + 1});
            return newModel;
-         case "TaskBoxAction": var updateTask = function (_p1) {
-              var _p2 = _p1;
-              var _p4 = _p2._1;
-              var _p3 = _p2._0;
-              return _U.eq(_p0._0,_p3) ? {ctor: "_Tuple2"
-                                         ,_0: _p3
-                                         ,_1: A2($TaskBox.update,_p0._1,_p4)} : {ctor: "_Tuple2"
-                                                                                ,_0: _p3
-                                                                                ,_1: _p4};
+         case "TaskBoxAction": var updateTask = function (_p2) {
+              var _p3 = _p2;
+              var _p5 = _p3._1;
+              var _p4 = _p3._0;
+              return _U.eq(_p0._0,_p4) ? {ctor: "_Tuple2"
+                                         ,_0: _p4
+                                         ,_1: A2($TaskBox.update,_p0._1,_p5)} : {ctor: "_Tuple2"
+                                                                                ,_0: _p4
+                                                                                ,_1: _p5};
            };
            var newModel = _U.update(model,
            {tasks: A2($List.map,updateTask,model.tasks)});
            return newModel;
          default: return _U.update(model,
            {tasks: A2($List.filter,
-           function (_p5) {
-              var _p6 = _p5;
-              return !_U.eq(_p0._0,_p6._0);
+           function (_p6) {
+              var _p7 = _p6;
+              return !_U.eq(_p0._0,_p7._0);
            },
            model.tasks)});}
    });
@@ -12077,22 +12084,22 @@ Elm.TaskColumn.make = function (_elm) {
       return {ctor: "TaskBoxAction",_0: a,_1: b};
    });
    var view = F3(function (context,address,model) {
-      var viewTask = function (_p7) {
-         var _p8 = _p7;
-         var _p9 = _p8._0;
+      var viewTask = function (_p8) {
+         var _p9 = _p8;
+         var _p10 = _p9._0;
          var taskContext = {deleteAddress: A2($Signal.forwardTo,
                            address,
-                           $Basics.always(RemoveTask(_p9)))
+                           $Basics.always(RemoveTask(_p10)))
                            ,moveLeftAddress: A2($Signal.forwardTo,
                            context.moveLeftAddress,
-                           $Basics.always(_p9))
+                           $Basics.always(_p10))
                            ,moveRightAddress: A2($Signal.forwardTo,
                            context.moveRightAddress,
-                           $Basics.always(_p9))};
+                           $Basics.always(_p10))};
          var taskBoxAddress = A2($Signal.forwardTo,
          address,
-         TaskBoxAction(_p9));
-         return A3($TaskBox.view,taskContext,taskBoxAddress,_p8._1);
+         TaskBoxAction(_p10));
+         return A3($TaskBox.view,taskContext,taskBoxAddress,_p9._1);
       };
       var tasks = A2($List.map,viewTask,model.tasks);
       return A2($Html.section,_U.list([]),tasks);
@@ -12106,6 +12113,7 @@ Elm.TaskColumn.make = function (_elm) {
                                    ,Model: Model
                                    ,Context: Context
                                    ,AddTask: AddTask
+                                   ,RemoveTask: RemoveTask
                                    ,First: First
                                    ,Surrounded: Surrounded
                                    ,Last: Last};
@@ -12247,7 +12255,38 @@ Elm.PersonalKanban.make = function (_elm) {
          case "MoveTaskLeft": return {ctor: "_Tuple2"
                                      ,_0: model
                                      ,_1: $Effects.none};
-         default: return {ctor: "_Tuple2",_0: model,_1: $Effects.none};}
+         default: var _p22 = _p0._0;
+           var removeFromColumn = function (_p11) {
+              var _p12 = _p11;
+              var _p15 = _p12._0;
+              var _p14 = _p12._1;
+              var _p13 = _p12._2;
+              return _U.eq(_p15,_p22) ? {ctor: "_Tuple3"
+                                        ,_0: _p15
+                                        ,_1: _p14
+                                        ,_2: A2($TaskColumn.update,
+                                        $TaskColumn.RemoveTask(_p0._1),
+                                        _p13)} : {ctor: "_Tuple3",_0: _p15,_1: _p14,_2: _p13};
+           };
+           var addTaskToRightColumn = function (_p16) {
+              var _p17 = _p16;
+              var _p20 = _p17._0;
+              var _p19 = _p17._1;
+              var _p18 = _p17._2;
+              return _U.eq(_p20,_p22 + 1) ? {ctor: "_Tuple3"
+                                            ,_0: _p20
+                                            ,_1: _p19
+                                            ,_2: A2($TaskColumn.update,
+                                            $TaskColumn.AddTask("MovedTask"),
+                                            _p18)} : {ctor: "_Tuple3",_0: _p20,_1: _p19,_2: _p18};
+           };
+           var newModel = _U.update(model,
+           {columns: A2($List.map,
+           function (_p21) {
+              return removeFromColumn(addTaskToRightColumn(_p21));
+           },
+           model.columns)});
+           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
    });
    var initColumns = function () {
       var fakeTaskDone = A2($TaskBox.withDescription,
@@ -12312,21 +12351,21 @@ Elm.PersonalKanban.make = function (_elm) {
       popupContext,
       A2($Signal.forwardTo,address,PopupAction),
       model.popup);
-      var viewColumnCell = function (_p11) {
-         var _p12 = _p11;
-         var _p13 = _p12._0;
+      var viewColumnCell = function (_p23) {
+         var _p24 = _p23;
+         var _p25 = _p24._0;
          var taskColumnContext = {moveRightAddress: A2($Signal.forwardTo,
                                  address,
-                                 MoveTaskRight(_p13))
+                                 MoveTaskRight(_p25))
                                  ,moveLeftAddress: A2($Signal.forwardTo,
                                  address,
-                                 MoveTaskLeft(_p13))};
+                                 MoveTaskLeft(_p25))};
          return A2($Html.td,
          _U.list([cellStyle]),
          _U.list([A3($TaskColumn.view,
          taskColumnContext,
-         A2($Signal.forwardTo,address,TaskColumnAction(_p13)),
-         _p12._2)]));
+         A2($Signal.forwardTo,address,TaskColumnAction(_p25)),
+         _p24._2)]));
       };
       var cellsRow = A2($Html.tr,
       _U.list([]),
@@ -12344,9 +12383,9 @@ Elm.PersonalKanban.make = function (_elm) {
       A2($List.map,
       viewHeader,
       A2($List.map,
-      function (_p14) {
-         var _p15 = _p14;
-         return _p15._1;
+      function (_p26) {
+         var _p27 = _p26;
+         return _p27._1;
       },
       model.columns)));
       return A2($Html.span,

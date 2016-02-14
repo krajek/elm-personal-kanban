@@ -12287,23 +12287,20 @@ Elm.PersonalKanban.make = function (_elm) {
          case "PopupAction": var newModel = _U.update(model,
            {popup: A2($AddTaskPopup.update,_p11._0,model.popup)});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
-         case "MoveTaskLeft": var _p22 = _p11._0;
-           var targetColumnId = _p22 - 1;
-           var newColumns = A5(moveTask,
-           model.columns,
-           _p22,
-           targetColumnId,
-           _p11._1,
-           "MOVED TASK");
-           var newModel = _U.update(model,{columns: newColumns});
-           return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};
-         default: var _p23 = _p11._0;
-           var targetColumnId = _p23 + 1;
+         default: var _p23 = _p11._1;
+           var targetColumnId = function () {
+              var _p22 = _p11._0;
+              if (_p22.ctor === "Left") {
+                    return _p23 - 1;
+                 } else {
+                    return _p23 + 1;
+                 }
+           }();
            var newColumns = A5(moveTask,
            model.columns,
            _p23,
            targetColumnId,
-           _p11._1,
+           _p11._2,
            "MOVED TASK");
            var newModel = _U.update(model,{columns: newColumns});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
@@ -12347,11 +12344,10 @@ Elm.PersonalKanban.make = function (_elm) {
    var Model = F2(function (a,b) {
       return {columns: a,popup: b};
    });
-   var MoveTaskRight = F2(function (a,b) {
-      return {ctor: "MoveTaskRight",_0: a,_1: b};
-   });
-   var MoveTaskLeft = F2(function (a,b) {
-      return {ctor: "MoveTaskLeft",_0: a,_1: b};
+   var Right = {ctor: "Right"};
+   var Left = {ctor: "Left"};
+   var MoveTask = F3(function (a,b,c) {
+      return {ctor: "MoveTask",_0: a,_1: b,_2: c};
    });
    var AddNewTaskToBoard = function (a) {
       return {ctor: "AddNewTaskToBoard",_0: a};
@@ -12376,10 +12372,10 @@ Elm.PersonalKanban.make = function (_elm) {
          var _p26 = _p25._0;
          var taskColumnContext = {moveRightAddress: A2($Signal.forwardTo,
                                  address,
-                                 MoveTaskRight(_p26))
+                                 A2(MoveTask,Right,_p26))
                                  ,moveLeftAddress: A2($Signal.forwardTo,
                                  address,
-                                 MoveTaskLeft(_p26))};
+                                 A2(MoveTask,Left,_p26))};
          return A2($Html.td,
          _U.list([cellStyle]),
          _U.list([A3($TaskColumn.view,
@@ -12422,8 +12418,9 @@ Elm.PersonalKanban.make = function (_elm) {
                                        ,AddNewTaskToBoardRequest: AddNewTaskToBoardRequest
                                        ,PopupAction: PopupAction
                                        ,AddNewTaskToBoard: AddNewTaskToBoard
-                                       ,MoveTaskLeft: MoveTaskLeft
-                                       ,MoveTaskRight: MoveTaskRight
+                                       ,MoveTask: MoveTask
+                                       ,Left: Left
+                                       ,Right: Right
                                        ,Model: Model
                                        ,initColumns: initColumns
                                        ,init: init

@@ -17,8 +17,11 @@ type Action
     | AddNewTaskToBoardRequest
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
-    | MoveTaskLeft Int Int
-    | MoveTaskRight Int Int
+    | MoveTask MoveDirection Int Int
+
+type MoveDirection
+  = Left
+  | Right
 
 -- MODEL
 
@@ -113,18 +116,12 @@ update action model =
       in
         (newModel, Effects.none)
 
-    MoveTaskLeft columnId taskId ->
+    MoveTask direction columnId taskId ->
       let
-        targetColumnId = columnId - 1
-        newColumns = moveTask model.columns columnId targetColumnId taskId "MOVED TASK"
-        newModel =
-          { model
-          | columns = newColumns }
-      in
-        (newModel, Effects.none)
-    MoveTaskRight columnId taskId ->
-      let
-        targetColumnId = columnId + 1
+        targetColumnId =
+          case direction of
+            Left -> columnId - 1
+            Right -> columnId + 1
         newColumns = moveTask model.columns columnId targetColumnId taskId "MOVED TASK"
         newModel =
           { model
@@ -185,8 +182,8 @@ view address model =
         let
           taskColumnContext : TaskColumn.Context
           taskColumnContext =
-            { moveRightAddress = Signal.forwardTo address <| MoveTaskRight id
-            , moveLeftAddress = Signal.forwardTo address <| MoveTaskLeft id }
+            { moveRightAddress = Signal.forwardTo address <| MoveTask Right id
+            , moveLeftAddress = Signal.forwardTo address <| MoveTask Left id }
         in
           td [cellStyle]
             [ TaskColumn.view taskColumnContext (Signal.forwardTo address (TaskColumnAction id)) column ]

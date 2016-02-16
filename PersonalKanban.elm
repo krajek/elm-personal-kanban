@@ -17,7 +17,7 @@ type Action
     | AddNewTaskToBoardRequest
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
-    | MoveTask MoveDirection Int Int
+    | MoveTask MoveDirection Int (Int, String)
 
 type MoveDirection
   = Left
@@ -116,13 +116,13 @@ update action model =
       in
         (newModel, Effects.none)
 
-    MoveTask direction columnId taskId ->
+    MoveTask direction columnId (taskId, desc) ->
       let
         targetColumnId =
           case direction of
             Left -> columnId - 1
             Right -> columnId + 1
-        newColumns = moveTask model.columns columnId targetColumnId taskId "MOVED TASK"
+        newColumns = moveTask model.columns columnId targetColumnId taskId desc
         newModel =
           { model
           | columns = newColumns }

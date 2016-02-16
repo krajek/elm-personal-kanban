@@ -11976,14 +11976,14 @@ Elm.TaskBox.make = function (_elm) {
       BothWays)) ? _U.list([A2($Html.button,
       _U.list([A2($Html$Events.onClick,
       context.moveRightAddress,
-      {ctor: "_Tuple0"})]),
+      model.description)]),
       _U.list([$Html.text("=>")]))]) : _U.list([]);
       var moveLeftPart = model.mouseOver && (_U.eq(model.movePossibility,
       OnlyLeft) || _U.eq(model.movePossibility,
       BothWays)) ? _U.list([A2($Html.button,
       _U.list([A2($Html$Events.onClick,
       context.moveLeftAddress,
-      {ctor: "_Tuple0"})]),
+      model.description)]),
       _U.list([$Html.text("<=")]))]) : _U.list([]);
       var movePart = A2($Basics._op["++"],moveLeftPart,moveRightPart);
       var descriptionPart = _U.list([$Html.text(model.description)]);
@@ -12092,10 +12092,14 @@ Elm.TaskColumn.make = function (_elm) {
                            $Basics.always(RemoveTask(_p10)))
                            ,moveLeftAddress: A2($Signal.forwardTo,
                            context.moveLeftAddress,
-                           $Basics.always(_p10))
+                           function (desc) {
+                              return {ctor: "_Tuple2",_0: _p10,_1: desc};
+                           })
                            ,moveRightAddress: A2($Signal.forwardTo,
                            context.moveRightAddress,
-                           $Basics.always(_p10))};
+                           function (desc) {
+                              return {ctor: "_Tuple2",_0: _p10,_1: desc};
+                           })};
          var taskBoxAddress = A2($Signal.forwardTo,
          address,
          TaskBoxAction(_p10));
@@ -12300,8 +12304,8 @@ Elm.PersonalKanban.make = function (_elm) {
            model.columns,
            _p23,
            targetColumnId,
-           _p11._2,
-           "MOVED TASK");
+           _p11._2._0,
+           _p11._2._1);
            var newModel = _U.update(model,{columns: newColumns});
            return {ctor: "_Tuple2",_0: newModel,_1: $Effects.none};}
    });

@@ -11947,7 +11947,7 @@ Elm.TaskBox.make = function (_elm) {
    var taskStyle = function (mouseOver) {
       return $Html$Attributes.style(_U.list([{ctor: "_Tuple2"
                                              ,_0: "border"
-                                             ,_1: mouseOver ? "1px solid red" : "1px solid black"}
+                                             ,_1: mouseOver ? "1px solid yellow" : "1px solid black"}
                                             ,{ctor: "_Tuple2",_0: "margin",_1: "20px 10px"}
                                             ,{ctor: "_Tuple2",_0: "cursor",_1: "pointer"}]));
    };

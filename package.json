@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/krajek/elm-personal-kanban#readme",
   "devDependencies": {
+    "elm": "^0.16.0",
     "gulp": "^3.9.1",
     "gulp-elm": "^0.2.0"
   }

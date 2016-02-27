@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "gulp": "3.9.1"
+  },
+  "name": "PersonalKanban",
+  "private": true,
+  "version": "1.0.0"
+}

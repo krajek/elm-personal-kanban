@@ -29,5 +29,8 @@
   "publishExclude": [
     "**.user",
     "**.vspscc"
-  ]
+  ],
+  "scripts": {
+    "prepublish": [ "npm install", "gulp" ]
+  }
 }

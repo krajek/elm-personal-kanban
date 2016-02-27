@@ -16,6 +16,4 @@ gulp.task('elm', function () {
       .pipe(gulp.dest(jsDest));
 });
 
-gulp.task('default', function () {
-    // place code for your default task here
-});
+gulp.task('default', ['elm']);

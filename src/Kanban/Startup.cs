@@ -24,6 +24,8 @@ namespace Kanban
                 app.UseBrowserLink();
             }
 
+            app.UseStaticFiles();
+
             app.UseIISPlatformHandler();
             app.UseMvc(routes =>
             {

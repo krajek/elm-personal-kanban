@@ -3,10 +3,13 @@ module PersonalKanban where
 import Effects exposing (Effects, none)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Http
 import TaskColumn
 import TaskHeader
 import TaskBox
 import AddTaskPopup
+import Task
+
 
 
 -- ACTION
@@ -18,6 +21,7 @@ type Action
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
     | MoveTask MoveDirection Int (Int, String)
+    | TasksLoaded (List String)
 
 type MoveDirection
   = Left
@@ -28,7 +32,6 @@ type MoveDirection
 type alias Model =
     { columns : List (Int, TaskHeader.Model, TaskColumn.Model)
     , popup : AddTaskPopup.Model }
-
 
 initColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
 initColumns =
@@ -59,7 +62,7 @@ init =
       { columns = initColumns
       , popup = AddTaskPopup.init }
   in
-    ( model, Effects.none )
+    ( model, Effects.task <| Task.succeed (TasksLoaded ["FIRST", "SECOND"]) )
 
 
 -- UPDATE
@@ -126,6 +129,23 @@ update action model =
         newModel =
           { model
           | columns = newColumns }
+      in
+        (newModel, Effects.none)
+    TasksLoaded names -> 
+        let
+        firstTaskDesc = names |> List.head |> Maybe.withDefault "DEFAULT TASK"
+        updateFirstColumn index (id, headerModel, columnModel) =
+          if index == 0 then
+            (id, headerModel, TaskColumn.update (TaskColumn.AddTask firstTaskDesc) columnModel)
+          else
+            (id, headerModel, columnModel)
+        newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
+        newColumns = List.indexedMap updateFirstColumn model.columns
+        newModel : Model
+        newModel =
+          { model
+          | columns = newColumns
+          , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
       in
         (newModel, Effects.none)
 

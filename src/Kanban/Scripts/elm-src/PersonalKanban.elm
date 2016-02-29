@@ -62,8 +62,6 @@ init =
       , popup = AddTaskPopup.init }
   in
     ( model, getTodoTasks )
-    --( model, Effects.task <| Task.succeed (TasksLoaded <| Just ["FIRST", "SECOND"]) )
-
 
 -- UPDATE
 
@@ -225,7 +223,7 @@ view address model =
 
 getTodoTasks : Effects Action
 getTodoTasks =
-  Http.get decodeTodoTask "http://localhost:5000/api/task"
+  Http.get decodeTodoTask "/api/task"
     |> Task.toMaybe
     |> Task.map TasksLoaded
     |> Effects.task

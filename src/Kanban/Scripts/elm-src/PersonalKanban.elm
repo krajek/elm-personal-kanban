@@ -9,8 +9,7 @@ import TaskHeader
 import TaskBox
 import AddTaskPopup
 import Task
-
-
+import Json.Decode as Json
 
 -- ACTION
 
@@ -21,7 +20,7 @@ type Action
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
     | MoveTask MoveDirection Int (Int, String)
-    | TasksLoaded (List String)
+    | TasksLoaded (Maybe (List String))
 
 type MoveDirection
   = Left
@@ -62,7 +61,8 @@ init =
       { columns = initColumns
       , popup = AddTaskPopup.init }
   in
-    ( model, Effects.task <| Task.succeed (TasksLoaded ["FIRST", "SECOND"]) )
+    ( model, getTodoTasks )
+    --( model, Effects.task <| Task.succeed (TasksLoaded <| Just ["FIRST", "SECOND"]) )
 
 
 -- UPDATE
@@ -131,23 +131,28 @@ update action model =
           | columns = newColumns }
       in
         (newModel, Effects.none)
-    TasksLoaded names -> 
-        let
-        firstTaskDesc = names |> List.head |> Maybe.withDefault "DEFAULT TASK"
-        updateFirstColumn index (id, headerModel, columnModel) =
-          if index == 0 then
-            (id, headerModel, TaskColumn.update (TaskColumn.AddTask firstTaskDesc) columnModel)
-          else
-            (id, headerModel, columnModel)
-        newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
-        newColumns = List.indexedMap updateFirstColumn model.columns
-        newModel : Model
-        newModel =
-          { model
-          | columns = newColumns
-          , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
-      in
-        (newModel, Effects.none)
+        
+    TasksLoaded maybeNames -> 
+        case maybeNames of
+            Just names -> 
+                let
+                    firstTaskDesc = names |> List.head |> Maybe.withDefault "DEFAULT TASK"
+                    updateFirstColumn index (id, headerModel, columnModel) =
+                    if index == 0 then
+                        (id, headerModel, TaskColumn.update (TaskColumn.AddTask firstTaskDesc) columnModel)
+                    else
+                        (id, headerModel, columnModel)
+                    newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
+                    newColumns = List.indexedMap updateFirstColumn model.columns
+                    newModel : Model
+                    newModel =
+                    { model
+                    | columns = newColumns
+                    , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
+                in
+                    (newModel, Effects.none)
+            Nothing ->
+                (model, Effects.none)
 
 moveTask : List (Int, TaskHeader.Model, TaskColumn.Model) -> Int -> Int -> Int -> String -> List (Int, TaskHeader.Model, TaskColumn.Model)
 moveTask columns columnId targetColumnId taskId taskDescription =
@@ -215,3 +220,16 @@ view address model =
     span []
       [ table [tableStyle] [headersRow, cellsRow]
       , popup ]
+
+-- EFFECTS
+
+getTodoTasks : Effects Action
+getTodoTasks =
+  Http.get decodeTodoTask "http://localhost:5000/api/task"
+    |> Task.toMaybe
+    |> Task.map TasksLoaded
+    |> Effects.task
+    
+decodeTodoTask : Json.Decoder (List String)
+decodeTodoTask =
+    Json.list Json.string

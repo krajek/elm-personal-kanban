@@ -134,12 +134,13 @@ update action model =
         case maybeNames of
             Just names -> 
                 let
-                    firstTaskDesc = names |> List.head |> Maybe.withDefault "DEFAULT TASK"
                     updateFirstColumn index (id, headerModel, columnModel) =
-                    if index == 0 then
-                        (id, headerModel, TaskColumn.update (TaskColumn.AddTask firstTaskDesc) columnModel)
-                    else
-                        (id, headerModel, columnModel)
+                        if index == 0 then
+                            let updateColumnWithNewTasks = 
+                                names |> List.foldl (\name acc -> TaskColumn.update (TaskColumn.AddTask name) acc) columnModel
+                            in (id, headerModel, updateColumnWithNewTasks)
+                        else
+                            (id, headerModel, columnModel)
                     newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
                     newColumns = List.indexedMap updateFirstColumn model.columns
                     newModel : Model

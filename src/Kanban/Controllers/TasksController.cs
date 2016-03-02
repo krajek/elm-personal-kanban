@@ -1,19 +1,22 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
-
-// For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-
+using Microsoft.Extensions.Logging;
 namespace Kanban.Controllers
 {
     [Route("api/task")]
     public class TasksController : Controller
     {
-        private System.Collections.Concurrent.BlockingCollection<string> tasks = 
-            new System.Collections.Concurrent.BlockingCollection<string>();
-        public TasksController() 
+        private static System.Collections.Concurrent.BlockingCollection<string> tasks = 
+            new System.Collections.Concurrent.BlockingCollection<string>() 
+            {
+                "FIRST TASK",
+                "SECOND TASK longer name"
+            };
+            
+        private readonly ILogger<TasksController> _logger;
+        public TasksController(ILogger<TasksController> logger) 
         {
-            tasks.Add("FIRST TASK");            
-            tasks.Add("SECOND TASK longer name");
+            _logger = logger;
         }
         
         // GET: api/values
@@ -32,8 +35,10 @@ namespace Kanban.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody]string description)
         {
+            tasks.Add(description);
+            _logger.LogInformation($"POST: {description}");
         }
 
         // PUT api/values/5

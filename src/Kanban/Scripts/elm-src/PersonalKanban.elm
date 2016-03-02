@@ -107,7 +107,7 @@ update action model =
           | columns = newColumns
           , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
       in
-        (newModel, Effects.none)
+        (newModel, postNewTask desc)
 
     PopupAction popupAction ->
       let
@@ -232,3 +232,22 @@ getTodoTasks =
 decodeTodoTask : Json.Decoder (List String)
 decodeTodoTask =
     Json.list Json.string
+    
+postNewTask : String -> Effects Action
+postNewTask description =
+    let 
+        url = "/api/task"
+        body = Http.string <| "\"" ++ description ++ "\""
+        decoder = Json.succeed ()
+        httpTask = 
+            Http.send Http.defaultSettings
+                { verb = "POST"
+                , headers = [("Content-Type", "application/json")]
+                , url = url
+                , body = body
+                }
+    in
+        httpTask
+        |> Task.toMaybe
+        |> Task.map (always NoOp)
+        |> Effects.task 

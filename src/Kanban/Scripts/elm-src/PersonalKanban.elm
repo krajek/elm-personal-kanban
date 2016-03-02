@@ -35,21 +35,20 @@ type alias Model =
 initColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
 initColumns =
   let
-    fakeTaskTodo = TaskBox.withDescription "Fake task" TaskBox.OnlyRight
     todoColumn =
       ( 1
       , { name = "To do", addActionAvailable = True }
-      , { tasks = [(1, fakeTaskTodo)], nextTaskID = 2, position = TaskColumn.First })
+      , { tasks = [], nextTaskID = 2, position = TaskColumn.First })
     fakeTaskInProgress = TaskBox.withDescription "Fake task" TaskBox.BothWays
     inProgressColumn =
       ( 2
       , { name = "In progress", addActionAvailable = False }
-      , { tasks = [(1, fakeTaskInProgress)], nextTaskID = 2, position = TaskColumn.Surrounded })
+      , { tasks = [], nextTaskID = 2, position = TaskColumn.Surrounded })
     fakeTaskDone = TaskBox.withDescription "Fake task" TaskBox.OnlyLeft
     doneColumn =
       ( 3
       , { name = "Done", addActionAvailable = False }
-      , { tasks = [(1, fakeTaskDone)], nextTaskID = 2, position = TaskColumn.Last })
+      , { tasks = [], nextTaskID = 2, position = TaskColumn.Last })
   in
     [todoColumn, inProgressColumn, doneColumn]
 

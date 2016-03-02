@@ -8,11 +8,19 @@ namespace Kanban.Controllers
     [Route("api/task")]
     public class TasksController : Controller
     {
+        private System.Collections.Concurrent.BlockingCollection<string> tasks = 
+            new System.Collections.Concurrent.BlockingCollection<string>();
+        public TasksController() 
+        {
+            tasks.Add("FIRST TASK");            
+            tasks.Add("SECOND TASK longer name");
+        }
+        
         // GET: api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "task1", "task with longer name" };
+            return tasks.ToArray();
         }
 
         // GET api/values/5

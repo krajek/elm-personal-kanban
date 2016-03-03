@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+
 namespace Kanban.Controllers
 {
     public class TaskModel 
@@ -12,11 +14,11 @@ namespace Kanban.Controllers
     [Route("api/task")]
     public class TasksController : Controller
     {
-        private static System.Collections.Concurrent.BlockingCollection<TaskModel> tasks = 
-            new System.Collections.Concurrent.BlockingCollection<TaskModel>() 
+        private static System.Collections.Concurrent.ConcurrentDictionary<int, string> tasks = 
+            new System.Collections.Concurrent.ConcurrentDictionary<int, string>() 
             {
-                new TaskModel() { Id = 1, Description = "First task" },
-                new TaskModel() { Id = 2, Description = "SECOND TASK longer name" }
+                [1] = "First task",
+                [2] = "SECOND TASK longer name"
             };
             
         private readonly ILogger<TasksController> _logger;
@@ -29,7 +31,9 @@ namespace Kanban.Controllers
         [HttpGet]
         public IEnumerable<TaskModel> Get()
         {
-            return tasks.ToArray();
+            return tasks
+                .ToArray()
+                .Select(kvp => new TaskModel() { Id = kvp.Key, Description = kvp.Value });
         }
 
         // GET api/values/5
@@ -43,7 +47,7 @@ namespace Kanban.Controllers
         [HttpPost]
         public void Post([FromBody]string description)
         {
-            tasks.Add(new TaskModel() { Id = 3, Description = description });
+            tasks.AddOrUpdate(3, _ => description, (k, p) => description);
             _logger.LogInformation($"POST: {description}");
         }
 
@@ -57,6 +61,8 @@ namespace Kanban.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            string description;
+            tasks.TryRemove(id, out description);
         }
     }
 }

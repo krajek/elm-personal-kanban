@@ -17,8 +17,9 @@ type Action
     = NoOp
     | TaskColumnAction Int TaskColumn.Action
     | AddNewTaskToBoardRequest
-    | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
+    | RemoveTaskFromBoardRequest Int Int
+    | PopupAction AddTaskPopup.Action    
     | MoveTask MoveDirection Int (Int, String)
     | TasksLoaded (Maybe (List (Int, String)))
 
@@ -77,19 +78,25 @@ update action model =
             then (id, h, TaskColumn.update columnAction c)
             else (id, h, c)
         newColumns = List.map updateColumn model.columns
-        newModel =
+        model' =
           { model
           | columns = newColumns }
       in
-        (newModel, Effects.none)
+        (model', Effects.none)
+        
+    RemoveTaskFromBoardRequest columnId taskId ->
+      let
+        model' = model
+      in
+        (model', Effects.none)
 
     AddNewTaskToBoardRequest ->
       let
-        newModel =
+        model' =
           { model
           | popup = AddTaskPopup.update AddTaskPopup.Show model.popup }
       in
-        (newModel, Effects.none)
+        (model', Effects.none)
 
     AddNewTaskToBoard desc ->
       let
@@ -100,21 +107,21 @@ update action model =
             (id, headerModel, columnModel)
         newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
         newColumns = List.indexedMap updateFirstColumn model.columns
-        newModel : Model
-        newModel =
+        model' : Model
+        model' =
           { model
           | columns = newColumns
           , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
       in
-        (newModel, postNewTask desc)
+        (model', postNewTask desc)
 
     PopupAction popupAction ->
       let
-        newModel =
+        model' =
           { model
           | popup = AddTaskPopup.update popupAction model.popup }
       in
-        (newModel, Effects.none)
+        (model', Effects.none)
 
     MoveTask direction columnId (taskId, desc) ->
       let
@@ -123,11 +130,11 @@ update action model =
             Left -> columnId - 1
             Right -> columnId + 1
         newColumns = moveTask model.columns columnId targetColumnId taskId desc
-        newModel =
+        model' =
           { model
           | columns = newColumns }
       in
-        (newModel, Effects.none)
+        (model', Effects.none)
         
     TasksLoaded maybeNames -> 
         case maybeNames of
@@ -143,13 +150,13 @@ update action model =
                             (id, headerModel, columnModel)
                     newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
                     newColumns = List.indexedMap updateFirstColumn model.columns
-                    newModel : Model
-                    newModel =
+                    model' : Model
+                    model' =
                     { model
                     | columns = newColumns
                     , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
                 in
-                    (newModel, Effects.none)
+                    (model', Effects.none)
             Nothing ->
                 (model, Effects.none)
 
@@ -207,7 +214,8 @@ view address model =
           taskColumnContext : TaskColumn.Context
           taskColumnContext =
             { moveRightAddress = Signal.forwardTo address <| MoveTask Right id
-            , moveLeftAddress = Signal.forwardTo address <| MoveTask Left id }
+            , moveLeftAddress = Signal.forwardTo address <| MoveTask Left id 
+            , removeTaskAddress = Signal.forwardTo address <| RemoveTaskFromBoardRequest id }
         in
           td [cellStyle]
             [ TaskColumn.view taskColumnContext (Signal.forwardTo address (TaskColumnAction id)) column ]

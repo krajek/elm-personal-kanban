@@ -60,7 +60,8 @@ update action model =
 
 type alias Context =
   { moveRightAddress : Signal.Address (Int, String)
-  , moveLeftAddress : Signal.Address (Int, String) }
+  , moveLeftAddress : Signal.Address (Int, String)
+  , removeTaskAddress : Signal.Address Int }
 
 
 view : Context -> Signal.Address Action -> Model -> Html
@@ -70,7 +71,7 @@ view context address model =
       let
         taskBoxAddress = Signal.forwardTo address <| TaskBoxAction taskId
         taskContext =
-          { deleteAddress = Signal.forwardTo address (always <| RemoveTask taskId)
+          { deleteAddress = Signal.forwardTo context.removeTaskAddress (always taskId)
           , moveLeftAddress = Signal.forwardTo context.moveLeftAddress (\desc -> (taskId, desc))
           , moveRightAddress = Signal.forwardTo context.moveRightAddress (\desc -> (taskId, desc)) }
       in

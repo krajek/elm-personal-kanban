@@ -86,7 +86,17 @@ update action model =
         
     RemoveTaskFromBoardRequest columnId taskId ->
       let
-        model' = model
+        updateColumn (id, headerModel, columnModel) =
+          if id == columnId then
+            (id, headerModel, TaskColumn.update (TaskColumn.RemoveTask taskId) columnModel)
+          else
+            (id, headerModel, columnModel)
+        newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
+        newColumns = List.map updateColumn model.columns
+        model' : Model
+        model' =
+          { model
+          | columns = newColumns }
       in
         (model', Effects.none)
 

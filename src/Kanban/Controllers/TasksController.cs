@@ -3,14 +3,20 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 namespace Kanban.Controllers
 {
+    public class TaskModel 
+    {
+        public int Id { get; set; }
+        public string Description { get; set; }        
+    }
+    
     [Route("api/task")]
     public class TasksController : Controller
     {
-        private static System.Collections.Concurrent.BlockingCollection<string> tasks = 
-            new System.Collections.Concurrent.BlockingCollection<string>() 
+        private static System.Collections.Concurrent.BlockingCollection<TaskModel> tasks = 
+            new System.Collections.Concurrent.BlockingCollection<TaskModel>() 
             {
-                "FIRST TASK",
-                "SECOND TASK longer name"
+                new TaskModel() { Id = 1, Description = "First task" },
+                new TaskModel() { Id = 2, Description = "SECOND TASK longer name" }
             };
             
         private readonly ILogger<TasksController> _logger;
@@ -21,7 +27,7 @@ namespace Kanban.Controllers
         
         // GET: api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<TaskModel> Get()
         {
             return tasks.ToArray();
         }
@@ -37,7 +43,7 @@ namespace Kanban.Controllers
         [HttpPost]
         public void Post([FromBody]string description)
         {
-            tasks.Add(description);
+            tasks.Add(new TaskModel() { Id = 3, Description = description });
             _logger.LogInformation($"POST: {description}");
         }
 

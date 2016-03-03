@@ -9,7 +9,7 @@ import TaskHeader
 import TaskBox
 import AddTaskPopup
 import Task
-import Json.Decode as Json
+import Json.Decode exposing (..)
 
 -- ACTION
 
@@ -20,7 +20,7 @@ type Action
     | PopupAction AddTaskPopup.Action
     | AddNewTaskToBoard String
     | MoveTask MoveDirection Int (Int, String)
-    | TasksLoaded (Maybe (List String))
+    | TasksLoaded (Maybe (List (Int, String)))
 
 type MoveDirection
   = Left
@@ -136,7 +136,8 @@ update action model =
                     updateFirstColumn index (id, headerModel, columnModel) =
                         if index == 0 then
                             let updateColumnWithNewTasks = 
-                                names |> List.foldl (\name acc -> TaskColumn.update (TaskColumn.AddTask name) acc) columnModel
+                                names 
+                                |> List.foldl (\(id, name) acc -> TaskColumn.update (TaskColumn.AddTask name) acc) columnModel
                             in (id, headerModel, updateColumnWithNewTasks)
                         else
                             (id, headerModel, columnModel)
@@ -223,21 +224,27 @@ view address model =
 
 getTodoTasks : Effects Action
 getTodoTasks =
-  Http.get decodeTodoTask "/api/task"
+  Http.get taskModelsDecoder "/api/task"
     |> Task.toMaybe
     |> Task.map TasksLoaded
     |> Effects.task
     
-decodeTodoTask : Json.Decoder (List String)
-decodeTodoTask =
-    Json.list Json.string
+taskModelsDecoder : Json.Decode.Decoder (List (Int,String))
+taskModelsDecoder =
+    Json.Decode.list taskModelDecoder
+    
+taskModelDecoder : Json.Decode.Decoder (Int,String)
+taskModelDecoder =
+    Json.Decode.object2 (,)
+      ("Id" := Json.Decode.int)
+      ("Description" := Json.Decode.string)
     
 postNewTask : String -> Effects Action
 postNewTask description =
     let 
         url = "/api/task"
         body = Http.string <| "\"" ++ description ++ "\""
-        decoder = Json.succeed ()
+        decoder = Json.Decode.succeed ()
         httpTask = 
             Http.send Http.defaultSettings
                 { verb = "POST"

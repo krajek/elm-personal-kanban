@@ -55,5 +55,11 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Node
 node_modules
 npm-debug.log
+
+#Visual studio
+*.suo
+*.xproj.user
+

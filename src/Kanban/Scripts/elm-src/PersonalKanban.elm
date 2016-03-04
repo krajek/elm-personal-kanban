@@ -39,17 +39,17 @@ initColumns =
     todoColumn =
       ( 1
       , { name = "To do", addActionAvailable = True }
-      , { tasks = [], nextTaskID = 2, position = TaskColumn.First })
+      , { tasks = [], position = TaskColumn.First })
     fakeTaskInProgress = TaskBox.withDescription "Fake task" TaskBox.BothWays
     inProgressColumn =
       ( 2
       , { name = "In progress", addActionAvailable = False }
-      , { tasks = [], nextTaskID = 2, position = TaskColumn.Surrounded })
+      , { tasks = [], position = TaskColumn.Surrounded })
     fakeTaskDone = TaskBox.withDescription "Fake task" TaskBox.OnlyLeft
     doneColumn =
       ( 3
       , { name = "Done", addActionAvailable = False }
-      , { tasks = [], nextTaskID = 2, position = TaskColumn.Last })
+      , { tasks = [], position = TaskColumn.Last })
   in
     [todoColumn, inProgressColumn, doneColumn]
 
@@ -112,7 +112,7 @@ update action model =
       let
         updateFirstColumn index (id, headerModel, columnModel) =
           if index == 0 then
-            (id, headerModel, TaskColumn.update (TaskColumn.AddTask desc) columnModel)
+            (id, headerModel, TaskColumn.update (TaskColumn.AddTask 3 desc) columnModel)
           else
             (id, headerModel, columnModel)
         newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
@@ -154,7 +154,7 @@ update action model =
                         if index == 0 then
                             let updateColumnWithNewTasks = 
                                 names 
-                                |> List.foldl (\(id, name) acc -> TaskColumn.update (TaskColumn.AddTask name) acc) columnModel
+                                |> List.foldl (\(id, name) acc -> TaskColumn.update (TaskColumn.AddTask id name) acc) columnModel
                             in (id, headerModel, updateColumnWithNewTasks)
                         else
                             (id, headerModel, columnModel)
@@ -175,7 +175,7 @@ moveTask columns columnId targetColumnId taskId taskDescription =
   let
     addTaskToRightColumn (id, headerModel, columnModel) =
       if id == targetColumnId then
-        (id, headerModel, TaskColumn.update (TaskColumn.AddTask taskDescription) columnModel)
+        (id, headerModel, TaskColumn.update (TaskColumn.AddTask taskId taskDescription) columnModel)
       else
         (id, headerModel, columnModel)
     removeFromColumn (id, headerModel, columnModel) =

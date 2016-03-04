@@ -6,7 +6,7 @@ import TaskBox
 import Debug
 
 type Action
-  = AddTask String
+  = AddTask Int String
   | TaskBoxAction Int TaskBox.Action
   | RemoveTask Int
 
@@ -17,24 +17,22 @@ type Position
 
 type alias Model =
   { tasks : List (Int, TaskBox.Model)
-  , nextTaskID : Int
   , position : Position }
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    AddTask content ->
+    AddTask id content ->
       let
         taskMove =
           case model.position of
             First -> TaskBox.OnlyRight
             Last -> TaskBox.OnlyLeft
             Surrounded -> TaskBox.BothWays
-        newTask = (model.nextTaskID, TaskBox.withDescription content taskMove)
+        newTask = (id, TaskBox.withDescription content taskMove)
         newModel =
             { model
-            | tasks = model.tasks ++ [newTask]
-            , nextTaskID = model.nextTaskID + 1 }
+            | tasks = model.tasks ++ [newTask] }
       in
         newModel
 

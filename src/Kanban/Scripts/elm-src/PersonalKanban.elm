@@ -9,7 +9,7 @@ import TaskHeader
 import TaskBox
 import AddTaskPopup
 import Task
-import Json.Decode exposing (..)
+import Json.Decode as Json exposing ((:=))
 
 -- ACTION
 
@@ -247,22 +247,22 @@ getTodoTasks =
     |> Task.map TasksLoaded
     |> Effects.task
     
-taskModelsDecoder : Json.Decode.Decoder (List (Int,String))
+taskModelsDecoder : Json.Decoder (List (Int,String))
 taskModelsDecoder =
-    Json.Decode.list taskModelDecoder
+    Json.list taskModelDecoder
     
-taskModelDecoder : Json.Decode.Decoder (Int,String)
+taskModelDecoder : Json.Decoder (Int,String)
 taskModelDecoder =
-    Json.Decode.object2 (,)
-      ("Id" := Json.Decode.int)
-      ("Description" := Json.Decode.string)
+    Json.object2 (,)
+      ("Id" := Json.int)
+      ("Description" := Json.string)
     
 postNewTask : String -> Effects Action
 postNewTask description =
     let 
         url = "/api/task"
         body = Http.string <| "\"" ++ description ++ "\""
-        decoder = Json.Decode.succeed ()
+        decoder = Json.succeed ()
         httpTask = 
             Http.send Http.defaultSettings
                 { verb = "POST"

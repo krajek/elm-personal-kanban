@@ -25,7 +25,7 @@ namespace Kanban.Controllers
                 [1] = "First task",
                 [2] = "SECOND TASK longer name"
             };
-        private volatile int nextId = 3;
+        private static volatile int nextId = 3;
             
         private readonly ILogger<TasksController> _logger;
         public TasksController(ILogger<TasksController> logger) 

@@ -18,6 +18,7 @@ type Action
     | TaskColumnAction Int TaskColumn.Action
     | AddNewTaskToBoardRequest
     | AddNewTaskToBoard String
+    | AddNewTaskToBoardConfirmed (Maybe (String, Int))
     | RemoveTaskFromBoardRequest Int Int
     | PopupAction AddTaskPopup.Action    
     | MoveTask MoveDirection Int (Int, String)
@@ -109,21 +110,28 @@ update action model =
         (model', Effects.none)
 
     AddNewTaskToBoard desc ->
-      let
-        updateFirstColumn index (id, headerModel, columnModel) =
-          if index == 0 then
-            (id, headerModel, TaskColumn.update (TaskColumn.AddTask 3 desc) columnModel)
-          else
-            (id, headerModel, columnModel)
-        newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
-        newColumns = List.indexedMap updateFirstColumn model.columns
-        model' : Model
-        model' =
-          { model
-          | columns = newColumns
-          , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
-      in
-        (model', postNewTask desc)
+      (model, postNewTask desc) 
+        
+    AddNewTaskToBoardConfirmed maybeArgs ->
+        case maybeArgs of
+            Just (desc,taskId) ->
+                let
+                    updateFirstColumn index (id, headerModel, columnModel) =
+                        if index == 0 then
+                            (id, headerModel, TaskColumn.update (TaskColumn.AddTask taskId desc) columnModel)
+                        else
+                            (id, headerModel, columnModel)
+                    newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
+                    newColumns = List.indexedMap updateFirstColumn model.columns
+                    model' : Model
+                    model' =
+                        { model
+                        | columns = newColumns
+                        , popup = AddTaskPopup.update AddTaskPopup.Hide model.popup }
+                in
+                    (model', Effects.none)
+            Nothing -> (model, Effects.none)
+                 
 
     PopupAction popupAction ->
       let
@@ -262,7 +270,7 @@ postNewTask description =
     let 
         url = "/api/task"
         body = Http.string <| "\"" ++ description ++ "\""
-        decoder = Json.succeed ()
+        decoder = Json.object1 identity ("Id" := Json.int)
         httpTask = 
             Http.send Http.defaultSettings
                 { verb = "POST"
@@ -272,8 +280,12 @@ postNewTask description =
                 }
     in
         httpTask
+        |> Http.fromJson decoder
         |> Task.toMaybe
-        |> Task.map (always NoOp)
+        |> Task.map (\maybeTaskId -> 
+            maybeTaskId
+            |> Maybe.map (\taskId -> (description, taskId))
+            |> AddNewTaskToBoardConfirmed)
         |> Effects.task 
         
 removeTask : Int -> Effects Action

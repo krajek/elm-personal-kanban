@@ -11,6 +11,11 @@ namespace Kanban.Controllers
         public string Description { get; set; }        
     }
     
+    public class AddTaskResponse 
+    {
+        public int Id { get; set; }        
+    }
+    
     [Route("api/task")]
     public class TasksController : Controller
     {
@@ -46,10 +51,13 @@ namespace Kanban.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string description)
+        public AddTaskResponse Post([FromBody]string description)
         {
-            tasks.AddOrUpdate(nextId++, _ => description, (k, p) => description);
+            var taskId = nextId++;
+            tasks.AddOrUpdate(taskId, _ => description, (k, p) => description);
             _logger.LogInformation($"POST: {description}");
+            
+            return new AddTaskResponse { Id = taskId };
         }
 
         // PUT api/values/5

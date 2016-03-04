@@ -20,6 +20,7 @@ namespace Kanban.Controllers
                 [1] = "First task",
                 [2] = "SECOND TASK longer name"
             };
+        private volatile int nextId = 3;
             
         private readonly ILogger<TasksController> _logger;
         public TasksController(ILogger<TasksController> logger) 
@@ -47,7 +48,7 @@ namespace Kanban.Controllers
         [HttpPost]
         public void Post([FromBody]string description)
         {
-            tasks.AddOrUpdate(3, _ => description, (k, p) => description);
+            tasks.AddOrUpdate(nextId++, _ => description, (k, p) => description);
             _logger.LogInformation($"POST: {description}");
         }
 
@@ -61,6 +62,7 @@ namespace Kanban.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            _logger.LogInformation($"DELETE: {id}");
             string description;
             tasks.TryRemove(id, out description);
         }

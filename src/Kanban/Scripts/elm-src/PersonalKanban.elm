@@ -98,7 +98,7 @@ update action model =
           { model
           | columns = newColumns }
       in
-        (model', Effects.none)
+        (model', removeTask taskId)
 
     AddNewTaskToBoardRequest ->
       let
@@ -267,6 +267,25 @@ postNewTask description =
             Http.send Http.defaultSettings
                 { verb = "POST"
                 , headers = [("Content-Type", "application/json")]
+                , url = url
+                , body = body
+                }
+    in
+        httpTask
+        |> Task.toMaybe
+        |> Task.map (always NoOp)
+        |> Effects.task 
+        
+removeTask : Int -> Effects Action
+removeTask taskId =
+    let 
+        url = "/api/task/"++ (toString taskId)
+        body = Http.empty
+        decoder = Json.succeed ()
+        httpTask = 
+            Http.send Http.defaultSettings
+                { verb = "DELETE"
+                , headers = []
                 , url = url
                 , body = body
                 }

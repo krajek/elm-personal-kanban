@@ -15,15 +15,21 @@ namespace Kanban.Controllers
     {
         public int Id { get; set; }        
     }
+
+    public class TaskProperties
+    {
+        public string Description { get; set; }
+        public int ColumnId { get; set; }
+    }
     
     [Route("api/task")]
     public class TasksController : Controller
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<int, string> tasks = 
-            new System.Collections.Concurrent.ConcurrentDictionary<int, string>() 
+        private static System.Collections.Concurrent.ConcurrentDictionary<int, TaskProperties> tasks = 
+            new System.Collections.Concurrent.ConcurrentDictionary<int, TaskProperties>() 
             {
-                [1] = "First task",
-                [2] = "SECOND TASK longer name"
+                [1] = new TaskProperties() { Description = "First task", ColumnId = 1 },
+                [2] = new TaskProperties() { Description = "SECOND TASK longer description", ColumnId = 2 },
             };
         private static volatile int nextId = 3;
             
@@ -39,7 +45,7 @@ namespace Kanban.Controllers
         {
             return tasks
                 .ToArray()
-                .Select(kvp => new TaskModel() { Id = kvp.Key, Description = kvp.Value });
+                .Select(kvp => new TaskModel() { Id = kvp.Key, Description = kvp.Value.Description });
         }
 
         // GET api/values/5
@@ -54,7 +60,13 @@ namespace Kanban.Controllers
         public AddTaskResponse Post([FromBody]string description)
         {
             var taskId = nextId++;
-            tasks.AddOrUpdate(taskId, _ => description, (k, p) => description);
+            var newTaskProperties = new TaskProperties()
+            {
+                Description = description,
+                ColumnId = 0
+            };
+
+            tasks.AddOrUpdate(taskId, _ => newTaskProperties, (k, p) => newTaskProperties);
             _logger.LogInformation($"POST: {description}");
             
             return new AddTaskResponse { Id = taskId };
@@ -71,8 +83,8 @@ namespace Kanban.Controllers
         public void Delete(int id)
         {
             _logger.LogInformation($"DELETE: {id}");
-            string description;
-            tasks.TryRemove(id, out description);
+            TaskProperties taskDescription;
+            tasks.TryRemove(id, out taskDescription);
         }
     }
 }

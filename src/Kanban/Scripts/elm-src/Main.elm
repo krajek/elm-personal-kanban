@@ -1,5 +1,6 @@
 import Effects exposing (Never)
-import PersonalKanban exposing (init, update, view)
+import KanbanBoard.Update exposing (init, update)
+import KanbanBoard.View exposing (view)
 import StartApp
 import Task
 

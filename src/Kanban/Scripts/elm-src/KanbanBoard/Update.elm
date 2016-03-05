@@ -1,68 +1,15 @@
-module PersonalKanban where
+module KanbanBoard.Update where
 
 import Effects exposing (Effects, none)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Http
 import TaskColumn
 import TaskHeader
 import TaskBox
 import AddTaskPopup
 import Task
-import Json.Decode as Json exposing ((:=))
 
--- ACTION
-
-type Action
-    = NoOp
-    | TaskColumnAction Int TaskColumn.Action
-    | AddNewTaskToBoardRequest
-    | AddNewTaskToBoard String
-    | AddNewTaskToBoardConfirmed (Maybe (String, Int))
-    | RemoveTaskFromBoardRequest Int Int
-    | PopupAction AddTaskPopup.Action    
-    | MoveTask MoveDirection Int (Int, String)
-    | TasksLoaded (Maybe (List (Int, String)))
-
-type MoveDirection
-  = Left
-  | Right
-
--- MODEL
-
-type alias Model =
-    { columns : List (Int, TaskHeader.Model, TaskColumn.Model)
-    , popup : AddTaskPopup.Model }
-
-initColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
-initColumns =
-  let
-    todoColumn =
-      ( 1
-      , { name = "To do", addActionAvailable = True }
-      , { tasks = [], position = TaskColumn.First })
-    fakeTaskInProgress = TaskBox.withDescription "Fake task" TaskBox.BothWays
-    inProgressColumn =
-      ( 2
-      , { name = "In progress", addActionAvailable = False }
-      , { tasks = [], position = TaskColumn.Surrounded })
-    fakeTaskDone = TaskBox.withDescription "Fake task" TaskBox.OnlyLeft
-    doneColumn =
-      ( 3
-      , { name = "Done", addActionAvailable = False }
-      , { tasks = [], position = TaskColumn.Last })
-  in
-    [todoColumn, inProgressColumn, doneColumn]
-
-
-init : (Model, Effects Action)
-init =
-  let
-    model =
-      { columns = initColumns
-      , popup = AddTaskPopup.init }
-  in
-    ( model, getTodoTasks )
+import KanbanBoard.Model exposing (Model, initColumns)
+import KanbanBoard.Action exposing (Action(..), MoveDirection(..))
+import KanbanBoard.Effects exposing (removeTask, postNewTask, getTodoTasks)
 
 -- UPDATE
 
@@ -193,116 +140,12 @@ moveTask columns columnId targetColumnId taskId taskDescription =
         (id, headerModel, columnModel)
   in
     columns |> List.map (addTaskToRightColumn >> removeFromColumn)
--- VIEW
-
-tableStyle : Attribute
-tableStyle =
-  style
-    [ ("table-layout", "fixed")
-    , ("width", "100%")
-    , ("height", "100%")
-    , ("border-collapse", "collapse") ]
-
-cellStyle : Attribute
-cellStyle =
-  style
-    [ ("border", "1px solid black")
-    , ("vertical-align", "top")]
-
-headerStyle : Attribute
-headerStyle =
-  style
-    [ ("height", "100px") ]
-
-headerCellStyle : Attribute
-headerCellStyle =
-  style
-    [("border", "1px solid black")]
-
-view : Signal.Address Action -> Model -> Html
-view address model =
+    
+init : (Model, Effects Action)
+init =
   let
-    headerContext = { addTaskAddress = Signal.forwardTo address (always AddNewTaskToBoardRequest)}
-    viewHeader headerModel =
-      th [headerCellStyle] [TaskHeader.view headerContext headerModel]
-
-
-    viewColumnCell (id, _, column) =
-        let
-          taskColumnContext : TaskColumn.Context
-          taskColumnContext =
-            { moveRightAddress = Signal.forwardTo address <| MoveTask Right id
-            , moveLeftAddress = Signal.forwardTo address <| MoveTask Left id 
-            , removeTaskAddress = Signal.forwardTo address <| RemoveTaskFromBoardRequest id }
-        in
-          td [cellStyle]
-            [ TaskColumn.view taskColumnContext (Signal.forwardTo address (TaskColumnAction id)) column ]
-    headersRow = tr [headerStyle] <| List.map viewHeader (List.map (\ (_, h, _) -> h) model.columns)
-    cellsRow = tr [] <| List.map viewColumnCell model.columns
-    popupContext = { addTaskAddress = Signal.forwardTo address AddNewTaskToBoard }
-    popup = AddTaskPopup.view  popupContext (Signal.forwardTo address PopupAction) model.popup
+    model =
+      { columns = initColumns
+      , popup = AddTaskPopup.init }
   in
-    span []
-      [ table [tableStyle] [headersRow, cellsRow]
-      , popup ]
-
--- EFFECTS
-
-getTodoTasks : Effects Action
-getTodoTasks =
-  Http.get taskModelsDecoder "/api/task"
-    |> Task.toMaybe
-    |> Task.map TasksLoaded
-    |> Effects.task
-    
-taskModelsDecoder : Json.Decoder (List (Int,String))
-taskModelsDecoder =
-    Json.list taskModelDecoder
-    
-taskModelDecoder : Json.Decoder (Int,String)
-taskModelDecoder =
-    Json.object2 (,)
-      ("Id" := Json.int)
-      ("Description" := Json.string)
-    
-postNewTask : String -> Effects Action
-postNewTask description =
-    let 
-        url = "/api/task"
-        body = Http.string <| "\"" ++ description ++ "\""
-        decoder = Json.object1 identity ("Id" := Json.int)
-        httpTask = 
-            Http.send Http.defaultSettings
-                { verb = "POST"
-                , headers = [("Content-Type", "application/json")]
-                , url = url
-                , body = body
-                }
-    in
-        httpTask
-        |> Http.fromJson decoder
-        |> Task.toMaybe
-        |> Task.map (\maybeTaskId -> 
-            maybeTaskId
-            |> Maybe.map (\taskId -> (description, taskId))
-            |> AddNewTaskToBoardConfirmed)
-        |> Effects.task 
-        
-removeTask : Int -> Effects Action
-removeTask taskId =
-    let 
-        url = "/api/task/"++ (toString taskId)
-        body = Http.empty
-        decoder = Json.succeed ()
-        httpTask = 
-            Http.send Http.defaultSettings
-                { verb = "DELETE"
-                , headers = []
-                , url = url
-                , body = body
-                }
-    in
-        httpTask
-        |> Task.toMaybe
-        |> Task.map (always NoOp)
-        |> Effects.task 
+    ( model, getTodoTasks )

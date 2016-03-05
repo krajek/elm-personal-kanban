@@ -7,7 +7,6 @@ import AddTaskPopup
 import Effects exposing (Effects)
 
 import KanbanBoard.Model exposing (Model, initColumns)
--- ACTION
 
 type Action
     = NoOp
@@ -18,7 +17,9 @@ type Action
     | RemoveTaskFromBoardRequest Int Int
     | PopupAction AddTaskPopup.Action    
     | MoveTask MoveDirection Int (Int, String)
-    | TasksLoaded (Maybe (List (Int, String)))
+    | TasksLoaded (Maybe (List TaskData))
+
+type alias TaskData = (Int, String)
 
 type MoveDirection
   = Left

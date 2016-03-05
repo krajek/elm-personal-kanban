@@ -5,7 +5,7 @@ import Http
 import Task
 import Json.Decode as Json exposing ((:=))
 
-import KanbanBoard.Action exposing (Action(..))
+import KanbanBoard.Action exposing (Action(..), TaskData)
 
 
 getTodoTasks : Effects Action
@@ -15,11 +15,11 @@ getTodoTasks =
     |> Task.map TasksLoaded
     |> Effects.task
     
-taskModelsDecoder : Json.Decoder (List (Int,String))
+taskModelsDecoder : Json.Decoder (List TaskData)
 taskModelsDecoder =
     Json.list taskModelDecoder
     
-taskModelDecoder : Json.Decoder (Int,String)
+taskModelDecoder : Json.Decoder TaskData
 taskModelDecoder =
     Json.object2 (,)
       ("Id" := Json.int)

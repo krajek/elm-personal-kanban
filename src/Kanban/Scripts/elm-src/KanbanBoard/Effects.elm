@@ -1,4 +1,4 @@
-module KanbanBoard.Effects where
+module KanbanBoard.Effects(getTodoTasks, postNewTask, removeTask) where
 
 import Effects exposing (Effects, none)
 import Http

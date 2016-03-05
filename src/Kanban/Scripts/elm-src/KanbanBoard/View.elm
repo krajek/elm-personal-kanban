@@ -1,4 +1,4 @@
-module KanbanBoard.View where
+module KanbanBoard.View(view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

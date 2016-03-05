@@ -1,4 +1,4 @@
-module KanbanBoard.Model where
+module KanbanBoard.Model(Model, initColumns) where
 
 import TaskColumn
 import TaskHeader
@@ -6,9 +6,6 @@ import TaskBox
 import Task
 import AddTaskPopup
 import Effects exposing (Effects)
-
-
--- MODEL
 
 type alias Model =
     { columns : List (Int, TaskHeader.Model, TaskColumn.Model)

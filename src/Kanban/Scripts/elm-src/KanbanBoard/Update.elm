@@ -1,4 +1,4 @@
-module KanbanBoard.Update where
+module KanbanBoard.Update(update, init) where
 
 import Effects exposing (Effects, none)
 import TaskColumn
@@ -11,7 +11,14 @@ import KanbanBoard.Model exposing (Model, initColumns)
 import KanbanBoard.Action exposing (Action(..), MoveDirection(..))
 import KanbanBoard.Effects exposing (removeTask, postNewTask, getTodoTasks)
 
--- UPDATE
+init : (Model, Effects Action)
+init =
+  let
+    model =
+      { columns = initColumns
+      , popup = AddTaskPopup.init }
+  in
+    ( model, getTodoTasks )
 
 update : Action -> Model -> (Model, Effects Action)
 update action model =
@@ -140,12 +147,3 @@ moveTask columns columnId targetColumnId taskId taskDescription =
         (id, headerModel, columnModel)
   in
     columns |> List.map (addTaskToRightColumn >> removeFromColumn)
-    
-init : (Model, Effects Action)
-init =
-  let
-    model =
-      { columns = initColumns
-      , popup = AddTaskPopup.init }
-  in
-    ( model, getTodoTasks )

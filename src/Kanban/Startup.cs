@@ -21,6 +21,7 @@ namespace Kanban
 
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
             }
 

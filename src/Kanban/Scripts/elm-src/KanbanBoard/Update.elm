@@ -116,7 +116,7 @@ update action model =
                         if index == 0 then
                             let updateColumnWithNewTasks = 
                                 names 
-                                |> List.foldl (\(id, name) acc -> TaskColumn.update (TaskColumn.AddTask id name) acc) columnModel
+                                |> List.foldl (\(id, name, colId) acc -> TaskColumn.update (TaskColumn.AddTask id name) acc) columnModel
                             in (id, headerModel, updateColumnWithNewTasks)
                         else
                             (id, headerModel, columnModel)

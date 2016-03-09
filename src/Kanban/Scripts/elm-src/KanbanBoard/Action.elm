@@ -19,7 +19,7 @@ type Action
     | MoveTask MoveDirection Int (Int, String)
     | TasksLoaded (Maybe (List TaskData))
 
-type alias TaskData = (Int, String)
+type alias TaskData = (Int, String, Int)
 
 type MoveDirection
   = Left

@@ -8,7 +8,9 @@ namespace Kanban.Controllers
     public class TaskModel 
     {
         public int Id { get; set; }
-        public string Description { get; set; }        
+        public string Description { get; set; } 
+        
+        public int ColumnId { get; set; }       
     }
     
     public class AddTaskResponse 
@@ -45,7 +47,12 @@ namespace Kanban.Controllers
         {
             return tasks
                 .ToArray()
-                .Select(kvp => new TaskModel() { Id = kvp.Key, Description = kvp.Value.Description });
+                .Select(kvp => new TaskModel() 
+                    { 
+                        Id = kvp.Key,
+                        Description = kvp.Value.Description,
+                        ColumnId = kvp.Value.ColumnId 
+                });
         }
 
         // GET api/values/5

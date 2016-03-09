@@ -108,20 +108,18 @@ update action model =
       in
         (model', Effects.none)
         
-    TasksLoaded maybeNames -> 
-        case maybeNames of
-            Just names -> 
+    TasksLoaded maybeTasks -> 
+        case maybeTasks of
+            Just tasks -> 
                 let
-                    updateFirstColumn index (id, headerModel, columnModel) =
-                        if index == 0 then
-                            let updateColumnWithNewTasks = 
-                                names 
-                                |> List.foldl (\(id, name, colId) acc -> TaskColumn.update (TaskColumn.AddTask id name) acc) columnModel
-                            in (id, headerModel, updateColumnWithNewTasks)
-                        else
-                            (id, headerModel, columnModel)
+                    appendTasksToColumn columnId (id, headerModel, columnModel) =
+                        let updateColumnWithNewTasks = 
+                            tasks
+                            |> List.filter (\(id, name, colId) -> colId == columnId ) 
+                            |> List.foldl (\(id, name, colId) acc -> TaskColumn.update (TaskColumn.AddTask id name) acc) columnModel
+                        in (id, headerModel, updateColumnWithNewTasks)
                     newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
-                    newColumns = List.indexedMap updateFirstColumn model.columns
+                    newColumns = List.indexedMap appendTasksToColumn model.columns
                     model' : Model
                     model' =
                     { model

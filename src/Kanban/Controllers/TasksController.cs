@@ -81,8 +81,10 @@ namespace Kanban.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody]TaskProperties properties)
         {
+            _logger.LogInformation($"PUT: {properties.Description} {properties.ColumnId}");
+            tasks.AddOrUpdate(id, (x) => properties, (x, p) => properties);
         }
 
         // DELETE api/values/5

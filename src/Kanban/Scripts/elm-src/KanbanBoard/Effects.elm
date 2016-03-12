@@ -4,6 +4,7 @@ import Effects exposing (Effects, none)
 import Http
 import Task
 import Json.Decode as Json exposing ((:=))
+import Json.Encode as JsonE
 
 import KanbanBoard.Action exposing (Action(..), TaskData)
 
@@ -58,6 +59,29 @@ removeTask taskId =
         httpTask = 
             Http.send Http.defaultSettings
                 { verb = "DELETE"
+                , headers = []
+                , url = url
+                , body = body
+                }
+    in
+        httpTask
+        |> Task.toMaybe
+        |> Task.map (always NoOp)
+        |> Effects.task 
+        
+updateTask : Int -> Int -> String -> Effects Action
+updateTask taskId columnId description =
+    let 
+        url = "/api/task"
+        body = 
+            [ ("Description", JsonE.string description), ("ColumnId", JsonE.int columnId)]
+            |> JsonE.object                
+            |> JsonE.encode 0
+            |> Http.string
+        decoder = Json.succeed ()
+        httpTask = 
+            Http.send Http.defaultSettings
+                { verb = "PUT"
                 , headers = []
                 , url = url
                 , body = body

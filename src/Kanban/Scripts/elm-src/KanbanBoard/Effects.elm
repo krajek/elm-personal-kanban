@@ -1,4 +1,8 @@
-module KanbanBoard.Effects(getTodoTasks, postNewTask, removeTask) where
+module KanbanBoard.Effects ( 
+      getTodoTasks
+    , postNewTask
+    , removeTask
+    , updateTask) where
 
 import Effects exposing (Effects, none)
 import Http
@@ -72,7 +76,7 @@ removeTask taskId =
 updateTask : Int -> Int -> String -> Effects Action
 updateTask taskId columnId description =
     let 
-        url = "/api/task"
+        url = "/api/task/" ++ toString taskId
         body = 
             [ ("Description", JsonE.string description), ("ColumnId", JsonE.int columnId)]
             |> JsonE.object                
@@ -82,7 +86,7 @@ updateTask taskId columnId description =
         httpTask = 
             Http.send Http.defaultSettings
                 { verb = "PUT"
-                , headers = []
+                , headers = [("Content-Type", "application/json")]
                 , url = url
                 , body = body
                 }

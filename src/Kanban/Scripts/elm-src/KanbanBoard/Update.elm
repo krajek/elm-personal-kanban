@@ -9,7 +9,7 @@ import Task
 
 import KanbanBoard.Model exposing (Model, initColumns)
 import KanbanBoard.Action exposing (Action(..), MoveDirection(..))
-import KanbanBoard.Effects exposing (removeTask, postNewTask, getTodoTasks)
+import KanbanBoard.Effects exposing (removeTask, postNewTask, getTodoTasks, updateTask)
 
 init : (Model, Effects Action)
 init =
@@ -106,7 +106,7 @@ update action model =
           { model
           | columns = newColumns }
       in
-        (model', Effects.none)
+        (model', updateTask taskId targetColumnId desc)
         
     TasksLoaded maybeTasks -> 
         case maybeTasks of

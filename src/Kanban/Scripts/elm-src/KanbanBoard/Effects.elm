@@ -26,7 +26,7 @@ taskModelsDecoder =
     
 taskModelDecoder : Json.Decoder TaskData
 taskModelDecoder =
-    Json.object3 (\id desc colId -> (id, desc, colId))
+    Json.object3 TaskData
       ("Id" := Json.int)
       ("Description" := Json.string)
       ("ColumnId" := Json.int)

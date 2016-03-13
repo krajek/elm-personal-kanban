@@ -112,14 +112,15 @@ update action model =
         case maybeTasks of
             Just tasks -> 
                 let
-                    appendTasksToColumn columnId (id, headerModel, columnModel) =
+                    appendTasksToColumn (columnId, headerModel, columnModel) =
                         let updateColumnWithNewTasks = 
                             tasks
-                            |> List.filter (\(id, name, colId) -> colId == columnId ) 
-                            |> List.foldl (\(id, name, colId) acc -> TaskColumn.update (TaskColumn.AddTask id name) acc) columnModel
-                        in (id, headerModel, updateColumnWithNewTasks)
+                            |> List.filter (\t -> t.columnId == columnId ) 
+                            |> List.foldl (\t acc -> TaskColumn.update (TaskColumn.AddTask t.taskId t.description) acc) columnModel
+                        in 
+                            (columnId, headerModel, updateColumnWithNewTasks)
                     newColumns : List (Int, TaskHeader.Model, TaskColumn.Model)
-                    newColumns = List.indexedMap appendTasksToColumn model.columns
+                    newColumns = List.map appendTasksToColumn model.columns
                     model' : Model
                     model' =
                     { model

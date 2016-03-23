@@ -62,7 +62,6 @@ namespace Kanban.Controllers
             return "value";
         }
 
-        // POST api/values
         [HttpPost]
         public AddTaskResponse Post([FromBody]string description)
         {

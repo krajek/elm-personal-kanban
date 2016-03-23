@@ -24,12 +24,6 @@ namespace Kanban.Test
         }
 
         [Fact]
-        public void DummyTest()
-        {
-            Assert.True(true);
-        }
-
-        [Fact]
         public async Task AddTask_ShouldGetResponseId()
         {
             // Act

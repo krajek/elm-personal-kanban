@@ -1,10 +1,16 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNet.TestHost;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace Kanban.Test
 {
+    public class AddTaskResponseJson
+    {
+        public int Id { get; set; }
+    }
+
     public class FirstTest
     {
         private readonly TestServer _server;
@@ -24,7 +30,7 @@ namespace Kanban.Test
         }
 
         [Fact]
-        public async Task AddTaskShouldGetResponseId()
+        public async Task AddTask_ShouldGetResponseId()
         {
             // Act
             var stringContent = new StringContent("DESCRIPTION");
@@ -34,7 +40,8 @@ namespace Kanban.Test
             var responseString = await response.Content.ReadAsStringAsync();
 
             // Assert
-            Assert.NotEmpty(responseString);
+            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(responseString);
+            Assert.True(addResult.Id > 0);
         }
     }
 }

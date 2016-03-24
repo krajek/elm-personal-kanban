@@ -57,9 +57,17 @@ namespace Kanban.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public TaskModel Get(int id)
         {
-            return "value";
+            return tasks
+                .Where(x => x.Key == id)
+                .Select(kvp => new TaskModel()
+                {
+                    Id = kvp.Key,
+                    Description = kvp.Value.Description,
+                    ColumnId = kvp.Value.ColumnId
+                })
+                .FirstOrDefault();
         }
 
         [HttpPost]

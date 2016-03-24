@@ -20,12 +20,12 @@ namespace Kanban.Test
         public int ColumnId { get; set; }
     }
 
-    public class FirstTest
+    public class TaskManipulation
     {
         private readonly TestServer _server;
         private readonly HttpClient _client;
 
-        public FirstTest()
+        public TaskManipulation()
         {
             _server = new TestServer(TestServer.CreateBuilder()
                 .UseStartup<Startup>());

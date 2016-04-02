@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Linq;
+using Microsoft.AspNet.Http;
 
 namespace Kanban.Controllers
 {
@@ -57,9 +58,9 @@ namespace Kanban.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public TaskModel Get(int id)
+        public IActionResult Get(int id)
         {
-            return tasks
+            var task = tasks
                 .Where(x => x.Key == id)
                 .Select(kvp => new TaskModel()
                 {
@@ -68,6 +69,13 @@ namespace Kanban.Controllers
                     ColumnId = kvp.Value.ColumnId
                 })
                 .FirstOrDefault();
+
+            if (task == null)
+            {
+                return new HttpNotFoundResult();
+            }
+
+            return new HttpOkObjectResult(task);
         }
 
         [HttpPost]

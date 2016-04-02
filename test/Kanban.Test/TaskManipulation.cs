@@ -37,11 +37,7 @@ namespace Kanban.Test
         {
             // Act
             const string description = "DESCRIPTION";
-            var postStringContent = new StringContent($"\"{description}\"");
-            postStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            var postResponse = await _client.PostAsync("/api/task/", postStringContent);
-            
-            var postResponseString = await postResponse.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+            var postResponseString = await Act_AddTask(description);
 
             // Assert
             var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(postResponseString);
@@ -53,6 +49,41 @@ namespace Kanban.Test
             var getResult = JsonConvert.DeserializeObject<GetTaskResponseJson>(getResponseString);
             Assert.Equal(description, getResult.Description);
 
+        }
+
+       
+
+        [Fact]
+        public async Task AddTask_ThenRemove_AndThenGetTask()
+        {
+            // Act
+            var addResponseString = await Act_AddTask("DESCRIPTION");
+            
+            // Assert
+            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(addResponseString);
+            Assert.True(addResult.Id > 0);
+
+            // Act
+            Act_RemoveTask(addResult.Id);
+
+            var getResponse = await _client.GetAsync($"api/task/{addResult.Id}");
+            Assert.False(getResponse.IsSuccessStatusCode); 
+        }
+
+        private async Task<string> Act_AddTask(string description)
+        {
+            var postStringContent = new StringContent($"\"{description}\"");
+            postStringContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var postResponse = await _client.PostAsync("/api/task/", postStringContent);
+
+            var postResponseString = await postResponse.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+            return postResponseString;
+        }
+
+        private async void Act_RemoveTask(int id)
+        {
+            var response = await _client.DeleteAsync($"api/task/{id}");
+            response.EnsureSuccessStatusCode();
         }
     }
 }

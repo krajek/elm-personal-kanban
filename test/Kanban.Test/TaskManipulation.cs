@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.AspNet.TestHost;
 using Newtonsoft.Json;
 using Xunit;
@@ -37,37 +39,41 @@ namespace Kanban.Test
         {
             // Act
             const string description = "DESCRIPTION";
-            var postResponseString = await Act_AddTask(description);
+            var addResponseString = await Act_AddTask(description);
 
             // Assert
-            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(postResponseString);
-            Assert.True(addResult.Id > 0);
+            var addResult = Assert_AddResponseIdIsValid(addResponseString);
 
             // Act
             var getResponse = await _client.GetAsync($"api/task/{addResult.Id}");
             var getResponseString = await getResponse.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
             var getResult = JsonConvert.DeserializeObject<GetTaskResponseJson>(getResponseString);
-            Assert.Equal(description, getResult.Description);
+            getResult.Description.Should().Be(description, "description should be retrieved without modifications");
 
         }
 
-       
+        private static AddTaskResponseJson Assert_AddResponseIdIsValid(string postResponseString)
+        {
+            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(postResponseString);
+            addResult.Id.Should().BeGreaterThan(0, "correct ids are greater than zero");
+            return addResult;
+        }
 
         [Fact]
         public async Task AddTask_ThenRemove_AndThenGetTask()
         {
             // Act
             var addResponseString = await Act_AddTask("DESCRIPTION");
-            
+
             // Assert
-            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(addResponseString);
-            Assert.True(addResult.Id > 0);
+            var addResult = Assert_AddResponseIdIsValid(addResponseString);
 
             // Act
-            Act_RemoveTask(addResult.Id);
+            await Act_RemoveTask(addResult.Id);
 
             var getResponse = await _client.GetAsync($"api/task/{addResult.Id}");
-            Assert.False(getResponse.IsSuccessStatusCode); 
+            getResponse.StatusCode.Should()
+                .Be(HttpStatusCode.NotFound, "get response with incorrect id should return not found status code");
         }
 
         private async Task<string> Act_AddTask(string description)
@@ -80,7 +86,7 @@ namespace Kanban.Test
             return postResponseString;
         }
 
-        private async void Act_RemoveTask(int id)
+        private async Task Act_RemoveTask(int id)
         {
             var response = await _client.DeleteAsync($"api/task/{id}");
             response.EnsureSuccessStatusCode();

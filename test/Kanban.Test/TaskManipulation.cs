@@ -22,41 +22,43 @@ namespace Kanban.Test
         public int ColumnId { get; set; }
     }
 
+    public class TaskPropertiesJson
+    {
+        public string Description { get; set; }
+        public int ColumnId { get; set; }
+    }
+
     public class TaskManipulation
     {
-        private readonly TestServer _server;
         private readonly HttpClient _client;
 
         public TaskManipulation()
         {
-            _server = new TestServer(TestServer.CreateBuilder()
+            var server = new TestServer(TestServer.CreateBuilder()
                 .UseStartup<Startup>());
-            _client = _server.CreateClient();
+            _client = server.CreateClient();
         }
 
         [Fact]
-        public async Task AddTask_ShouldGetResponseId_AndThenGetTask()
+        public async Task AddTask_ThenUpdate_AndThenGetTask()
         {
-            // Act
+            // Act - add task
             const string description = "DESCRIPTION";
             var addResponseString = await Act_AddTask(description);
 
-            // Assert
+            // Assert - response id
             var addResult = Assert_AddResponseIdIsValid(addResponseString);
 
-            // Act
+            // Act - update
+            const string newDescription = "NEW DESCRIPTION";
+            await Act_UpdateTask(addResult.Id, newDescription);
+
+            // Assert - get description
             var getResponse = await _client.GetAsync($"api/task/{addResult.Id}");
             var getResponseString = await getResponse.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
             var getResult = JsonConvert.DeserializeObject<GetTaskResponseJson>(getResponseString);
-            getResult.Description.Should().Be(description, "description should be retrieved without modifications");
+            getResult.Description.Should().Be(newDescription, "description should be retrieved after modification");
 
-        }
-
-        private static AddTaskResponseJson Assert_AddResponseIdIsValid(string postResponseString)
-        {
-            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(postResponseString);
-            addResult.Id.Should().BeGreaterThan(0, "correct ids are greater than zero");
-            return addResult;
         }
 
         [Fact]
@@ -86,10 +88,32 @@ namespace Kanban.Test
             return postResponseString;
         }
 
+        private async Task<string> Act_UpdateTask(int id, string description)
+        {
+            var properties = new TaskPropertiesJson()
+            {
+                Description = description,
+                ColumnId = 1
+            };
+            var content = new StringContent(JsonConvert.SerializeObject(properties));
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var response = await _client.PutAsync($"/api/task/{id}", content);
+
+            var responseString = await response.EnsureSuccessStatusCode().Content.ReadAsStringAsync();
+            return responseString;
+        }
+
         private async Task Act_RemoveTask(int id)
         {
             var response = await _client.DeleteAsync($"api/task/{id}");
             response.EnsureSuccessStatusCode();
+        }
+
+        private static AddTaskResponseJson Assert_AddResponseIdIsValid(string postResponseString)
+        {
+            var addResult = JsonConvert.DeserializeObject<AddTaskResponseJson>(postResponseString);
+            addResult.Id.Should().BeGreaterThan(0, "correct ids are greater than zero");
+            return addResult;
         }
     }
 }
